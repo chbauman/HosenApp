@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Test</string>
+    <string name="reset">Reset</string>
+    <string name="go_back">Goh Zrugg</string>
+    <string name="action_settings">Settings</string>
+    <string name="edit_message">Dini Mueter</string>
+    <string name="button_send">Send de Shit</string>
+    <string name="hose_str">Hosenabe</string>
+    <string name="score_str">%1$.2f Pünkt.</string>
+    <string name="game_over">Spiel Vorbii</string>
+    <string name="new_game">Neus Spiel</string>
+    <string name="take_all">Nimm Alli</string>
+    <string name="knock">Chlopf</string>
+    <string name="fire_or_pants">Füür oder Hose</string>
+    <string name="default_title">Titel</string>
+</resources>
