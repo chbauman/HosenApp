@@ -406,6 +406,18 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
             used_cards.set(hand_base_ind + k, hand_cards[k]);
         }
 
+        // Check for trap
+        if(trapOnTable()){
+            if(take_all_score > curr_score){
+                ta = true;
+                table_index = -1;
+                hand_index = -1;
+            } else {
+                table_index = 3;
+                hand_index = 0;
+            }
+        }
+
         // Take hidden card
         if(curr_max_score <= curr_score){
             table_index = 3;
