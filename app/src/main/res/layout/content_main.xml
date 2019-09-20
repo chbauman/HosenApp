@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/main_layout"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".MainActivity"
     tools:showIn="@layout/activity_main">
@@ -12,10 +13,11 @@
         android:id="@+id/card1"
         android:layout_width="79dp"
         android:layout_height="123dp"
-        android:layout_marginStart="72dp"
-        android:layout_marginLeft="72dp"
-        android:layout_marginBottom="30dp"
-        app:layout_constraintBottom_toTopOf="@+id/tkall"
+        android:layout_alignEnd="@+id/card2"
+        android:layout_alignRight="@+id/card2"
+        android:layout_alignBottom="@+id/card2"
+        android:layout_marginRight="89dp"
+        android:layout_marginBottom="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/entwurf" />
 
@@ -23,7 +25,9 @@
         android:id="@+id/card2"
         android:layout_width="79dp"
         android:layout_height="123dp"
-        android:layout_marginBottom="30dp"
+        android:layout_above="@+id/hose"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="25dp"
         app:layout_constraintBottom_toTopOf="@+id/tkall"
         app:layout_constraintEnd_toStartOf="@+id/card3"
         app:layout_constraintStart_toEndOf="@+id/card1"
@@ -33,20 +37,22 @@
         android:id="@+id/card3"
         android:layout_width="79dp"
         android:layout_height="123dp"
-        android:layout_marginEnd="72dp"
-        android:layout_marginRight="72dp"
-        android:layout_marginBottom="30dp"
-        app:layout_constraintBottom_toTopOf="@+id/tkall"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_alignEnd="@+id/card2"
+        android:layout_alignRight="@+id/card2"
+        android:layout_alignBottom="@+id/card2"
+        android:layout_marginRight="-89dp"
+        android:layout_marginBottom="0dp"
         app:srcCompat="@drawable/entwurf" />
 
     <ImageView
         android:id="@+id/cd_op1"
         android:layout_width="54dp"
         android:layout_height="81dp"
-        android:layout_marginStart="100dp"
-        android:layout_marginLeft="100dp"
-        android:layout_marginTop="20dp"
+        android:layout_alignTop="@+id/cd_op2"
+        android:layout_alignEnd="@+id/cd_op2"
+        android:layout_alignRight="@+id/cd_op2"
+        android:layout_marginTop="0dp"
+        android:layout_marginRight="64dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cd_verd"
         app:srcCompat="@drawable/entwurf" />
@@ -55,60 +61,61 @@
         android:id="@+id/cd_op2"
         android:layout_width="54dp"
         android:layout_height="81dp"
-        android:layout_marginTop="20dp"
-        app:layout_constraintEnd_toStartOf="@+id/cd_op3"
-        app:layout_constraintStart_toEndOf="@+id/cd_op1"
-        app:layout_constraintTop_toBottomOf="@+id/cd_verd"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/card2"
+        android:layout_marginBottom="131dp"
         app:srcCompat="@drawable/entwurf" />
 
     <ImageView
         android:id="@+id/cd_op3"
         android:layout_width="54dp"
         android:layout_height="81dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="100dp"
-        android:layout_marginRight="100dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cd_verd"
+        android:layout_alignTop="@+id/cd_op2"
+        android:layout_alignEnd="@+id/cd_op2"
+        android:layout_alignRight="@+id/cd_op2"
+        android:layout_marginTop="0dp"
+        android:layout_marginRight="-64dp"
         app:srcCompat="@drawable/entwurf" />
 
     <ImageView
         android:id="@+id/cd_verd"
         android:layout_width="81dp"
         android:layout_height="54dp"
+        android:layout_above="@+id/cd_op2"
+        android:layout_alignEnd="@+id/cd_op2"
+        android:layout_alignRight="@+id/cd_op2"
+        android:layout_marginRight="-13.5dp"
+        android:layout_marginBottom="10dp"
         app:layout_constraintBottom_toTopOf="@+id/card2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/entwurf" />
 
     <ImageView
         android:id="@+id/p1"
         android:layout_width="54dp"
         android:layout_height="81dp"
-        android:layout_marginStart="20dp"
+        android:layout_alignTop="@+id/p2"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
         android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="0dp"
         app:srcCompat="@drawable/entwurf" />
 
     <ImageView
         android:id="@+id/p2"
         android:layout_width="54dp"
         android:layout_height="81dp"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-        app:layout_constraintEnd_toStartOf="@+id/p3"
-        app:layout_constraintStart_toEndOf="@+id/p1"
-        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/entwurf" />
 
     <ImageView
         android:id="@+id/p3"
         android:layout_width="54dp"
         android:layout_height="81dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="20dp"
+        android:layout_alignTop="@+id/p2"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="0dp"
         android:layout_marginRight="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -118,9 +125,10 @@
         android:id="@+id/chlopf"
         android:layout_width="130dp"
         android:layout_height="70dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_alignRight="@+id/hose"
+        android:layout_alignBottom="@+id/hose"
+        android:layout_marginRight="140dp"
+        android:layout_marginBottom="0dp"
         android:onClick="knockButton"
         android:text="@string/knock"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -130,23 +138,21 @@
         android:id="@+id/tkall"
         android:layout_width="130dp"
         android:layout_height="70dp"
-        android:layout_marginBottom="10dp"
+        android:layout_alignLeft="@+id/hose"
+        android:layout_alignBottom="@+id/hose"
+        android:layout_marginLeft="140dp"
+        android:layout_marginBottom="0dp"
         android:onClick="takeAllButton"
-        android:text="@string/take_all"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/hose"
-        app:layout_constraintStart_toEndOf="@+id/chlopf" />
+        android:text="@string/take_all" />
 
     <Button
         android:id="@+id/hose"
         android:layout_width="130dp"
         android:layout_height="70dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:onClick="fireButton"
-        android:text="@string/fire_or_pants"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:text="@string/fire_or_pants"/>
 
-</android.support.constraint.ConstraintLayout>
+</RelativeLayout>

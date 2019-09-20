@@ -23,14 +23,18 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -76,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     // Array containing the Views of the other players
     ImageView[] p_views;
 
+    List<TextView> addedTextsViews = new ArrayList<TextView>();
+
     public void startNew(){
         startNewGame();
     }
@@ -91,6 +97,15 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         forced_lost_index = -1;
         fire_index = -1;
         hose_index = -1;
+
+        // Remove texts
+        Iterator itr = addedTextsViews.iterator();
+        while (itr.hasNext()) {
+            TextView v = (TextView)itr.next();
+            ViewGroup vg = (ViewGroup)(v.getParent());
+            vg.removeView(v);
+            itr.remove();
+        }
 
         // Shuffle deck
         List<Integer> rp = getRandPerm(n_cards).subList(0, n_used_cards);
@@ -133,8 +148,6 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         p_views[0] = findViewById(R.id.p3);
         p_views[1] = findViewById(R.id.p2);
         p_views[2] = findViewById(R.id.p1);
-
-
 
         // Initialize game
         n_play_cs = n_players * 3;
@@ -498,7 +511,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         // Check if knocked
         if(k){
             Log.d("Player " + (playerId + 1), " knocked");
-            knock();
+            knock(playerId + 1);
             return;
         }
         // Take all cards
@@ -531,6 +544,8 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
             Log.d("Player " + (playerId + 1), " hosed");
             if(pantsDown(playerId + 1)){
                 hose_index = playerId + 1;
+                ImageView player_card_view = p_views[playerId];
+                setTextViewBelowImgView(player_card_view, R.string.pants_down);
             } else {
                 forced_lost_index = playerId + 1;
             }
@@ -551,9 +566,13 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
 
     }
 
-    public void knock(){
+    public void knock(int playerId){
         if(turn_ind < n_players){
             throw new IllegalStateException("Cannot knock now!");
+        }
+        if(playerId > 0){
+            ImageView player_card_view = p_views[playerId - 1];
+            setTextViewBelowImgView(player_card_view, R.string.knocker);
         }
         if(chlopfed < 0){
             chlopfed = turn_ind;
@@ -583,7 +602,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     public void knockButton(View view) {
         if(turn_ind >= n_players){
             if(turn == 0){
-                knock();
+                knock(0);
                 nextTurn();
             }
         }
@@ -698,6 +717,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         final int first_card_arr_ind = playerID * 3;
         final int first_card_id = used_cards.get(first_card_arr_ind);
         final int color = first_card_id / 9;
+        boolean has_ace = false;
         for(int i = 0; i < 3; ++i){
             final int hand_arr_ind = playerID * 3 + i;
             final int curr_hand_card_id = used_cards.get(hand_arr_ind);
@@ -705,11 +725,17 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
             final boolean right_col = curr_color == color;
             final boolean ace = curr_hand_card_id % 9 == 0;
             final boolean image = curr_hand_card_id % 9 > 4;
+            if(ace){
+                has_ace = true;
+            }
             if(!right_col || (!ace && !image)) {
                 return false;
             }
         }
-        return true;
+        if(has_ace){
+            return true;
+        }
+        return false;
     }
 
     public boolean trapOnTable(){
@@ -741,6 +767,25 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     }
 
     // Image view helper functions
+    public void setTextViewBelowImgView(ImageView iv, int s){
+
+        int top_dist = iv.getTop();
+        int left_dist = iv.getLeft();
+        top_dist += iv.getHeight();
+
+        // Add TextView
+        RelativeLayout rl = findViewById(R.id.main_layout);
+        TextView tv = new TextView(this);
+        tv.setText(s);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+        params.leftMargin = left_dist;
+        params.topMargin = top_dist;
+        rl.addView(tv, params);
+        addedTextsViews.add(tv);
+    }
+
     public void setHidden(){
         Bitmap card_bmp = getCard(54, 0);
         Matrix matrix = new Matrix();

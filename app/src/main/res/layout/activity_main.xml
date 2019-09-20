@@ -13,6 +13,6 @@
 
     <include
         layout="@layout/content_main"
-        android:layout_height="470dp" />
+        android:layout_height="match_parent" />
 
 </android.support.design.widget.CoordinatorLayout>
