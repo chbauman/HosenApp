@@ -24,7 +24,13 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.AnimationUtils;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
+import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -108,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }
 
         // Shuffle deck
-        List<Integer> rp = getRandPerm(n_cards).subList(0, n_used_cards);
+        List<Integer> rp = Util.getRandPerm(n_cards).subList(0, n_used_cards);
         used_cards = new ArrayList<>(rp);
 
         // Set Card images
@@ -196,16 +202,16 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
                             int hand_c_id = used_cards.get(hand_ind);
                             int table_c_id = used_cards.get(table_ind);
 
-                            // Swap
-                            used_cards.set(hand_ind, table_c_id);
-                            used_cards.set(table_ind, hand_c_id);
-                            setCard(table_c_id, hand_ind, true);
-                            if(i_final != 3){
-                                setCard(hand_c_id, i_final, false);
-                            }
+
+                            Log.d("i", "" + i_final);
+                            Log.d("hand_ind", "" + hand_ind);
+                            takeCardWithAnim(0, i_final, hand_ind);
+
+
+
 
                             // Abort Game if trap hit
-                            if(trap_set){
+                            if(trap_set && i_final != 3){
                                 Log.d("falle", "Haha, so dummm!");
                                 forced_lost_index = 0;
                                 openGameOverDialog();
@@ -313,22 +319,6 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }, (n_players) * baseAnimTime * 2);
     }
 
-    public TranslateAnimation getLinearAnim(@NotNull ImageView v1, @NotNull ImageView v2, int animTime){
-
-        float centreX_player = v1.getX() + v1.getWidth()  / 2.0f;
-        float centreY_player = v1.getY() + v1.getHeight() / 2.0f;
-        float centreX_dest = v2.getX() + v2.getWidth()  / 2.0f;
-        float centreY_dest = v2.getY() + v2.getHeight() / 2.0f;
-
-        final float dx = centreX_dest - centreX_player;
-        final float dy = centreY_dest - centreY_player;
-
-        TranslateAnimation anim = new TranslateAnimation(0.0f, dx, 0.0f, dy);
-        anim.setInterpolator(new LinearInterpolator());
-        anim.setRepeatCount(0);
-        anim.setDuration(animTime);
-        return anim;
-    }
 
     public class Move{
         Move(int t, int h, boolean hc, boolean fire, boolean ta, boolean hose){
@@ -464,7 +454,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
             final int animTime = baseAnimTime;
             ImageView playerView = p_views[playerId - 1];
             ImageView destView = tc_views[table_index];
-            TranslateAnimation anim = getLinearAnim(playerView, destView, animTime);
+            TranslateAnimation anim = Util.getLinearAnim(playerView, destView, animTime);
 
             //Start animation
             playerView.startAnimation(anim);
@@ -479,14 +469,66 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
                     }
                 }, animTime);
             }
+            if(table_index != 3){
+                setPlayerCard(playerId - 1, hand_c_id);
+            }
+        } else {
+            if(table_index != 3){
+                setCard(hand_c_id, table_index, false);
+            }
+            setCard(table_c_id, h_arr_ind, true);
         }
 
         // Swap
         used_cards.set(h_arr_ind, table_c_id);
         used_cards.set(t_arr_ind, hand_c_id);
-        if(table_index != 3){
+    }
+
+    // Animation
+    public void takeCardWithAnim(int playerId, int table_index, int hand_index){
+
+        Log.d(ps[playerId], "taking card " + table_index);
+
+        final int t_arr_ind = n_play_cs + table_index;
+        final int h_arr_ind = playerId * 3 + hand_index;
+
+        // Get cards
+        final int hand_c_id = used_cards.get(h_arr_ind);
+        final int table_c_id = used_cards.get(t_arr_ind);
+
+        final int animTime = baseAnimTime;
+        ImageView pCardView = playerId == 0? hc_views[hand_index]: p_views[playerId - 1];
+        ImageView destView = tc_views[table_index];
+
+        // Uncover player card if covered
+        if(table_index != 3 && playerId != 0){
             setPlayerCard(playerId - 1, hand_c_id);
         }
+        TranslateAnimation anim = Util.getLinearAnim(pCardView, destView, animTime);
+        pCardView.startAnimation(anim);
+
+        final int p_fin = playerId - 1;
+        final int t_ind = table_index;
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+            // Set table card
+            if(t_ind != 3){
+                setCard(hand_c_id, t_ind, false);
+            }
+            if(p_fin >= 0){
+                // Cover player card
+                setPlayerBG(p_fin);
+            } else  {
+                // Set hand card
+                setCard(table_c_id, h_arr_ind, true);
+            }
+            }
+        }, animTime);
+
+        // Swap
+        used_cards.set(h_arr_ind, table_c_id);
+        used_cards.set(t_arr_ind, hand_c_id);
     }
 
     // Player actions
@@ -545,7 +587,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
             if(pantsDown(playerId + 1)){
                 hose_index = playerId + 1;
                 ImageView player_card_view = p_views[playerId];
-                setTextViewBelowImgView(player_card_view, R.string.pants_down);
+                setTextViewBelowImgView(player_card_view, R.string.pants_down, false);
             } else {
                 forced_lost_index = playerId + 1;
             }
@@ -572,7 +614,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }
         if(playerId > 0){
             ImageView player_card_view = p_views[playerId - 1];
-            setTextViewBelowImgView(player_card_view, R.string.knocker);
+            setTextViewBelowImgView(player_card_view, R.string.knocker, true);
         }
         if(chlopfed < 0){
             chlopfed = turn_ind;
@@ -757,24 +799,19 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }
     }
 
-    public ArrayList<Integer> getRandPerm(int len){
-        ArrayList<Integer> arr = new ArrayList<>(len);
-        for(int i = 0; i < len; ++i){
-            arr.add(i);
-        }
-        java.util.Collections.shuffle(arr);
-        return arr;
-    }
 
     // Image view helper functions
-    public void setTextViewBelowImgView(ImageView iv, int s){
+    public void setTextViewBelowImgView(ImageView iv, int s, boolean add_bw_anim){
+
+        RelativeLayout rl = findViewById(R.id.main_layout);
+        int l_w = rl.getWidth();
+        int l_h = rl.getHeight();
 
         int top_dist = iv.getTop();
         int left_dist = iv.getLeft();
         top_dist += iv.getHeight();
 
         // Add TextView
-        RelativeLayout rl = findViewById(R.id.main_layout);
         TextView tv = new TextView(this);
         tv.setText(s);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
@@ -784,6 +821,49 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         params.topMargin = top_dist;
         rl.addView(tv, params);
         addedTextsViews.add(tv);
+
+        // Get Text params
+        tv.measure(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        int t_height = tv.getMeasuredHeight();
+        int t_width = tv.getMeasuredWidth();
+
+        // Define animation params
+        Interpolator ip = new LinearInterpolator();
+        int animDuration = 600;
+        int animPauseLength = 100;
+
+        float scale_fac = ((float) l_w) / t_width;
+        float dy = (float) (l_h - t_height) / 2 - top_dist;
+        float dx = (float) -left_dist;
+        Log.d("scaling factor: ", "" + scale_fac);
+
+        // Scaling
+        float reciprocal_sf = 1.0f / scale_fac;
+        ScaleAnimation scAnim = new ScaleAnimation(1.0f, scale_fac, 1.0f, scale_fac);
+        ScaleAnimation scAnimBW = new ScaleAnimation(1.0f, reciprocal_sf, 1.0f, reciprocal_sf);
+        scAnimBW.setStartOffset(animDuration + animPauseLength);
+
+        // Translation
+        TranslateAnimation anim = new TranslateAnimation(0.0f, dx, 0.0f, dy);
+        TranslateAnimation animBW = new TranslateAnimation(0.0f, -dx , 0.0f, -dy);
+        animBW.setStartOffset(animDuration + animPauseLength);
+
+        // Put them together
+        AnimationSet animSet = new AnimationSet(true);
+        animSet.setFillAfter(true);
+        animSet.setDuration(animDuration);
+        animSet.setInterpolator(ip);
+
+        // Add to set
+        animSet.addAnimation(scAnim);
+        animSet.addAnimation(anim);
+        if(add_bw_anim){
+            animSet.addAnimation(animBW);
+            animSet.addAnimation(scAnimBW);
+        }
+
+        // Start
+        tv.startAnimation(animSet);
     }
 
     public void setHidden(){

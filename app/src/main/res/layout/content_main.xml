@@ -9,40 +9,6 @@
     tools:context=".MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <ImageView
-        android:id="@+id/card1"
-        android:layout_width="79dp"
-        android:layout_height="123dp"
-        android:layout_alignEnd="@+id/card2"
-        android:layout_alignRight="@+id/card2"
-        android:layout_alignBottom="@+id/card2"
-        android:layout_marginRight="89dp"
-        android:layout_marginBottom="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/entwurf" />
-
-    <ImageView
-        android:id="@+id/card2"
-        android:layout_width="79dp"
-        android:layout_height="123dp"
-        android:layout_above="@+id/hose"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="25dp"
-        app:layout_constraintBottom_toTopOf="@+id/tkall"
-        app:layout_constraintEnd_toStartOf="@+id/card3"
-        app:layout_constraintStart_toEndOf="@+id/card1"
-        app:srcCompat="@drawable/entwurf" />
-
-    <ImageView
-        android:id="@+id/card3"
-        android:layout_width="79dp"
-        android:layout_height="123dp"
-        android:layout_alignEnd="@+id/card2"
-        android:layout_alignRight="@+id/card2"
-        android:layout_alignBottom="@+id/card2"
-        android:layout_marginRight="-89dp"
-        android:layout_marginBottom="0dp"
-        app:srcCompat="@drawable/entwurf" />
 
     <ImageView
         android:id="@+id/cd_op1"
@@ -121,6 +87,40 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/entwurf" />
 
+    <ImageView
+        android:id="@+id/card1"
+        android:layout_width="79dp"
+        android:layout_height="123dp"
+        android:layout_alignEnd="@+id/card2"
+        android:layout_alignRight="@+id/card2"
+        android:layout_alignBottom="@+id/card2"
+        android:layout_marginRight="89dp"
+        android:layout_marginBottom="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/entwurf" />
+
+    <ImageView
+        android:id="@+id/card2"
+        android:layout_width="79dp"
+        android:layout_height="123dp"
+        android:layout_above="@+id/hose"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="25dp"
+        app:layout_constraintBottom_toTopOf="@+id/tkall"
+        app:layout_constraintEnd_toStartOf="@+id/card3"
+        app:layout_constraintStart_toEndOf="@+id/card1"
+        app:srcCompat="@drawable/entwurf" />
+
+    <ImageView
+        android:id="@+id/card3"
+        android:layout_width="79dp"
+        android:layout_height="123dp"
+        android:layout_alignEnd="@+id/card2"
+        android:layout_alignRight="@+id/card2"
+        android:layout_alignBottom="@+id/card2"
+        android:layout_marginRight="-89dp"
+        android:layout_marginBottom="0dp"
+        app:srcCompat="@drawable/entwurf" />
     <Button
         android:id="@+id/chlopf"
         android:layout_width="130dp"

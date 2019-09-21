@@ -55,6 +55,7 @@ public class GameOverDialog extends DialogFragment {
         }
         View view = inflater.inflate(R.layout.layout_dialog, null);
 
+
         ListView lv = view.findViewById(R.id.list_view);
         MyAdapter clad = new MyAdapter(getActivity(), titleArr, b);
         lv.setAdapter(clad);

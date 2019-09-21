@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MyAdapter extends ArrayAdapter<String> {
@@ -29,13 +30,34 @@ public class MyAdapter extends ArrayAdapter<String> {
 
         View row = layoutInflater.inflate(R.layout.list_row, null);
 
+        // Extract data from bundle
         float[] scores = b.getFloatArray("player_scores");
         String[] titleArr = b.getStringArray("player_names");
+
+        // Find Views
         TextView title = row.findViewById(R.id.list_title_id);
         TextView sub_title = row.findViewById(R.id.list_subtitle_id);
+
+        ImageView[] cardViews = new ImageView[3];
+        cardViews[0] = row.findViewById(R.id.fc1);
+        cardViews[1] = row.findViewById(R.id.fc2);
+        cardViews[2] = row.findViewById(R.id.fc3);
+
+        // Set cards
+        // TODO
+
+        // Set name of player and score
         if(titleArr != null && scores != null){
             title.setText(titleArr[position]);
-            sub_title.setText(c.getResources().getString(R.string.score_str, scores[position]));
+            float curr_score = scores[position];
+            if(curr_score == 0.0f){
+                sub_title.setText(c.getResources().getString(R.string.lost));
+            } else if(curr_score == 32.0f){
+                sub_title.setText(c.getResources().getString(R.string.fire));
+            } else {
+                sub_title.setText(c.getResources().getString(R.string.score_str, curr_score));
+            }
+
         } else {
             throw new IllegalStateException("Pass the right fucking arrays!");
         }
