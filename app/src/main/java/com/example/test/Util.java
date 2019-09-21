@@ -1,5 +1,13 @@
 package com.example.test;
 
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.VectorDrawable;
+import android.util.Log;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
@@ -11,6 +19,7 @@ import java.util.ArrayList;
 // Helper class containing utility functions
 class Util {
 
+
     // Returns a random permutaion of length 'len'.
     static ArrayList<Integer> getRandPerm(int len){
         ArrayList<Integer> arr = new ArrayList<>(len);
@@ -20,6 +29,7 @@ class Util {
         java.util.Collections.shuffle(arr);
         return arr;
     }
+
 
     static TranslateAnimation getLinearAnim(@NotNull ImageView v1, @NotNull ImageView v2, int animTime){
 

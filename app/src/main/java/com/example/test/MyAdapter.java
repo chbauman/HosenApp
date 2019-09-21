@@ -33,6 +33,9 @@ public class MyAdapter extends ArrayAdapter<String> {
         // Extract data from bundle
         float[] scores = b.getFloatArray("player_scores");
         String[] titleArr = b.getStringArray("player_names");
+        int[] ids = b.getIntArray("player_ids");
+        int[] cards = b.getIntArray("cards");
+        int n_players = b.getInt("n_players");
 
         // Find Views
         TextView title = row.findViewById(R.id.list_title_id);

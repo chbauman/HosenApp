@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     // last 4: Three open and one hidden card (last)
     ArrayList<Integer> used_cards;
 
-    Bitmap cards;
+    Cards cards;
 
     // State variables
     int sel_hand_c = -1;
@@ -138,7 +138,8 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         Resources res = getResources();
         Drawable drawable = res.getDrawable(R.drawable.ic_card_deck_161536, getTheme());
         VectorDrawable vectorDrawable = (VectorDrawable) drawable;
-        cards = getBitmap(vectorDrawable, 615, 1027);
+        //cards = Util.getBitmap(vectorDrawable, 615, 1027);
+        cards = new Cards(this);
 
         // Set the views
         hc_views = new ImageView[3];
@@ -271,22 +272,37 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
             }
         }
 
+        // Put data for dialog into bundle
+        GameOverDialog goDialog = new GameOverDialog();
+        Bundle game_over_data = new Bundle();
+
         // Sort and keep indices
         int[] indices = new IndirectSorter<Float>().sort(scores);
         float[] scores_cp = new float[n_players];
         String[] players_cp = new String[n_players];
+        int[] playerIds = new int[n_players];
+
+        // Scores, Player Ids and Names
         for (int i = 0; i < n_players; ++i) {
             final int curr_ind = indices[i];
             scores_cp[n_players - 1 - i] = scores[curr_ind];
             players_cp[n_players - 1 - i] = ps[curr_ind];
+            playerIds[n_players - 1 - i] = curr_ind;
         }
-
-        // Put data for dialog into bundle
-        GameOverDialog goDialog = new GameOverDialog();
-        Bundle game_over_data = new Bundle();
         game_over_data.putStringArray("player_names", players_cp);
         game_over_data.putFloatArray("player_scores", scores_cp);
+        game_over_data.putIntArray("player_ids", playerIds);
         game_over_data.putInt("n_players", n_players);
+
+        // Add used cards
+        int[] cards = new int[n_players * 3];
+        for(int i = 0; i < n_players * 3; ++i){
+            cards[i] = used_cards.get(i);
+        }
+        game_over_data.putIntArray("cards", cards);
+
+
+        // Add bundle and show
         goDialog.setArguments(game_over_data);
         goDialog.show(getSupportFragmentManager(),"GameOverDialog");
     }
@@ -867,7 +883,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     }
 
     public void setHidden(){
-        Bitmap card_bmp = getCard(54, 0);
+        Bitmap card_bmp = cards.getCardBackground();
         Matrix matrix = new Matrix();
         matrix.postRotate(90);
         card_bmp = Bitmap.createBitmap(card_bmp, 0, 0, card_bmp.getWidth(), card_bmp.getHeight(), matrix, true);
@@ -875,24 +891,24 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     }
 
     public void setPlayerCard(int p_ind, int card_id){
-        Bitmap card_bmp = getCard(card_id, 4);
+        Bitmap card_bmp = cards.getCard(card_id);
         p_views[p_ind].setImageBitmap(card_bmp);
     }
 
     public void setPlayerBG(int p_ind){
-        Bitmap card_bmp = getCard(54, 0);
+        Bitmap card_bmp = cards.getCardBackground();
         p_views[p_ind].setImageBitmap(card_bmp);
     }
 
     public void setPlayerBGImages(){
-        Bitmap card_bmp = getCard(54, 0);
+        Bitmap card_bmp = cards.getCardBackground();
         for(int i = 0; i < 3; ++i){
             p_views[i].setImageBitmap(card_bmp);
         }
     }
 
     public void setCard(int card_id, int view_array_id, boolean hand){
-        Bitmap card_bmp = getCard(card_id);
+        Bitmap card_bmp = cards.getCard(card_id);
         if(view_array_id == 3){
             Matrix matrix = new Matrix();
             matrix.postRotate(90);
@@ -903,31 +919,5 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         } else {
             tc_views[view_array_id].setImageBitmap(card_bmp);
         }
-    }
-
-    public Bitmap getCard(int ind, int offset){
-        Bitmap mBitmap = cards;
-        final int cs_per_col = 13 - offset;
-        int h = mBitmap.getHeight();
-        int w = mBitmap.getWidth();
-        int h_card = h / 5;
-        int w_card = w / 13;
-        int row = (ind / cs_per_col) % 5;
-        int col_h = ind % cs_per_col;
-        int col = col_h == 0 ? 0 : offset + ind % cs_per_col;
-        mBitmap = Bitmap.createBitmap(mBitmap, col * w_card, row * h_card, w_card, h_card);
-        return mBitmap;
-    }
-    public Bitmap getCard(int ind){
-        return getCard(ind, 4);
-    }
-
-    private static Bitmap getBitmap(VectorDrawable vectorDrawable, int h, int w) {
-        Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        vectorDrawable.draw(canvas);
-        Log.d("Hoi", "getBitmap: 1");
-        return bitmap;
     }
 }
