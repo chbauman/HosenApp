@@ -46,6 +46,7 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements GameOverDialog.GODialogListener {
 
+
     int n_used_cards;
     int n_play_cs;
     final int n_players = 4;
@@ -60,9 +61,12 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     ArrayList<Integer> used_cards;
 
     Cards cards;
+    GamePlant game;
 
     // State variables
     int sel_hand_c = -1;
+
+
     int chlopfed = -100;
     int turn_ind = 0;
 
@@ -135,10 +139,6 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         setContentView(R.layout.activity_main);
 
         // Load the cards
-        Resources res = getResources();
-        Drawable drawable = res.getDrawable(R.drawable.ic_card_deck_161536, getTheme());
-        VectorDrawable vectorDrawable = (VectorDrawable) drawable;
-        //cards = Util.getBitmap(vectorDrawable, 615, 1027);
         cards = new Cards(this);
 
         // Set the views
@@ -157,6 +157,12 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         p_views[2] = findViewById(R.id.p1);
 
         // Initialize game
+        game = new GamePlant(n_players);
+        game.choose_stack(true);
+        game.findMoveAdvanced(0);
+        game.findMoveAdvanced(1);
+        game.findMoveAdvanced(2);
+
         n_play_cs = n_players * 3;
         n_used_cards = n_play_cs + 4;
 

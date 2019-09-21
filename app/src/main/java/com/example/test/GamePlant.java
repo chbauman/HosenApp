@@ -1,5 +1,7 @@
 package com.example.test;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +12,8 @@ public class GamePlant {
 
     // Constants
     final int n_players;
-    final int beginner_ind;
+
+    int beginner_ind;
 
     // Derived constants
     final int n_used_cards;
@@ -38,19 +41,17 @@ public class GamePlant {
     // last 4: Three open and one hidden card (last)
     ArrayList<Integer> used_cards;
 
-    GamePlant(int n_players, int beginner_ind){
-        if (beginner_ind >= n_players){
-            throw new IllegalArgumentException("Beginner index can not be larger than number of players");
-        }
+    GamePlant(int n_players){
         this.n_players = n_players;
-        this.beginner_ind = beginner_ind;
         n_used_cards = n_players * 3 + 4;
         t_cards_start_ind = n_players * 3;
+        beginner_ind = -1;
         startGame();
     }
 
     // (Re)set variables
     public void startGame(){
+
         // Shuffle deck
         List<Integer> rp = Util.getRandPerm(n_cards).subList(0, n_used_cards);
         used_cards = new ArrayList<>(rp);
@@ -58,6 +59,7 @@ public class GamePlant {
         // Set states
         turn_ind = 0;
         knock_ind = -10 - n_players;
+        beginner_ind = (beginner_ind + 1) % n_players;
 
         declaration_pending = false;
         id_caught_in_trap = -1;
@@ -114,7 +116,7 @@ public class GamePlant {
 
     // After move declare if you are on fire or your pants are down.
     public GameState declare(boolean pants_or_fire){
-        if(declaration_pending){
+        if(!declaration_pending){
             throw new IllegalStateException("Need to make a move first!");
         }
 
@@ -151,6 +153,102 @@ public class GamePlant {
             scores[i] = computeScore(i);
         }
         return new GameOverState(id_caught_in_trap, id_fired, id_wrong_declared, used_cards, scores);
+    }
+
+    // Automatic moving
+    public void findMoveAdvanced(int playerID){
+
+        // Initialize
+        int table_index = -1;
+        int hand_index = -1;
+        boolean has_knocked = false;
+        boolean ta = false;
+
+        // Compute current score
+        final float curr_score = computeScore(playerID);
+        if(curr_score > 26.0f && turn_ind >= n_players){
+            has_knocked = true;
+        }
+
+        // Compute best score after changing
+        int[] table_cards = new int[3];
+        int[] hand_cards = new int[3];
+        int table_base_ind = n_players * 3;
+        int hand_base_ind = playerID * 3;
+
+        // Copy current cards
+        for (int i = 0; i < 3; ++i) {
+            table_cards[i] = used_cards.get(table_base_ind + i);
+            hand_cards[i] = used_cards.get(hand_base_ind + i);
+        }
+
+        // Try all swaps and choose the one yielding maximum score
+        float curr_max_score = curr_score;
+        float temp_score;
+        for (int i = 0; i < 3; ++i) {
+            for (int k = 0; k < 3; ++k) {
+                // Set card
+                used_cards.set(hand_base_ind + i, table_cards[k]);
+                temp_score = computeScore(playerID);
+                if (temp_score > curr_max_score) {
+                    curr_max_score = temp_score;
+                    table_index = k;
+                    hand_index = i;
+                }
+                // Set back
+                used_cards.set(hand_base_ind + i, hand_cards[i]);
+            }
+        }
+
+        // Check Take all
+        for (int k = 0; k < 3; ++k) {
+            used_cards.set(hand_base_ind + k, table_cards[k]);
+        }
+        float take_all_score = computeScore(playerID);
+        if (take_all_score > curr_max_score) {
+            ta = true;
+            curr_max_score = take_all_score;
+        }
+        for (int k = 0; k < 3; ++k) {
+            used_cards.set(hand_base_ind + k, hand_cards[k]);
+        }
+
+        // Check for trap
+        if (trapOnTable()) {
+            if (take_all_score > curr_score) {
+                ta = true;
+            } else {
+                table_index = 3;
+                hand_index = 0;
+            }
+        }
+
+        // Take hidden card
+        if (curr_max_score <= curr_score) {
+            table_index = 3;
+            hand_index = 0;
+        }
+
+        // Move
+        Log.d("now", "moving");
+        if(has_knocked){
+            make_move(true, false, -1, -1);
+        } else if(ta){
+            make_move(false, true, -1, -1);
+        } else {
+            make_move(false, false, hand_index, table_index);
+        }
+
+        // Check for fire or pants down
+        float score_after = computeScore(playerID);
+        boolean dec = false;
+        if(score_after > 30.5f){
+            dec = true;
+        }
+
+        Log.d("now", "declaring");
+        // Declare
+        declare(dec);
     }
 
     // Actions
