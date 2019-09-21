@@ -1,6 +1,7 @@
 package com.example.test;
 
 import android.annotation.TargetApi;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -16,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -65,7 +67,9 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
 
     // State variables
     int sel_hand_c = -1;
-
+    int starting_player = 0;
+    boolean declared = false;
+    boolean your_turn = false;
 
     int chlopfed = -100;
     int turn_ind = 0;
@@ -103,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         chlopfed = -100;
         turn_ind = 0;
         game_over = false;
+
         turn = 0;
         forced_lost_index = -1;
         fire_index = -1;
@@ -121,6 +126,25 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         List<Integer> rp = Util.getRandPerm(n_cards).subList(0, n_used_cards);
         used_cards = new ArrayList<>(rp);
 
+        // Start new game
+        game.startGame();
+        game.beginner_ind = 0;
+        used_cards = game.used_cards;
+
+        setCardsAsDeck(false);
+
+        // Wait for declaration
+        final Handler handler = new Handler();
+        int dec_delay = 2000;
+        handler.postDelayed(new Runnable() {
+                public void run() {
+                    // first move (switching cards)
+                    changeCardsDialog();
+                }}, dec_delay);
+
+    }
+
+    public void setCardsAsDeck(boolean open_table){
         // Set Card images
         setHidden();
         setPlayerBGImages();
@@ -128,8 +152,36 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
             int hand_cd_id = used_cards.get(i);
             int table_cd_id = used_cards.get(n_play_cs + i);
             setCard(hand_cd_id, i, true);
-            setCard(table_cd_id, i, false);
+            if(open_table){
+                setCard(table_cd_id, i, false);
+            }
         }
+        if(!open_table){
+            setTableCardsToBG();
+        }
+    }
+
+    public void changeCardsDialog(){
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        game.choose_stack(true);
+                        setCardsAsDeck(true);
+                        moveNext(false);
+                        break;
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        game.choose_stack(false);
+                        setCardsAsDeck(true);
+                        moveNext(false);
+                        break;
+                }
+            }
+        };
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Change cards?").setPositiveButton("Yes", dialogClickListener)
+                .setNegativeButton("No", dialogClickListener).show();
     }
 
     @TargetApi(21)
@@ -158,10 +210,6 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
 
         // Initialize game
         game = new GamePlant(n_players);
-        game.choose_stack(true);
-        game.findMoveAdvanced(0);
-        game.findMoveAdvanced(1);
-        game.findMoveAdvanced(2);
 
         n_play_cs = n_players * 3;
         n_used_cards = n_play_cs + 4;
@@ -194,55 +242,76 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
                 @Override
                 public boolean onTouch(final View view, final MotionEvent event) {
 
-                    if (event.getAction() == MotionEvent.ACTION_DOWN && turn == 0) {
+                    if (event.getAction() == MotionEvent.ACTION_DOWN && your_turn) {
 
-                        Log.d("UP", "fuck " + i_final);
                         if(sel_hand_c != -1 && !game_over){
+                            your_turn = false;
 
-                            // Check Falle
-                            final boolean trap_set = trapOnTable();
-
-                            // Swap
+                            // Make move
+                            game.make_move(false, false, sel_hand_c, i_final);
                             int hand_ind = sel_hand_c;
-                            int table_ind = n_play_cs + i_final;
-
-                            int hand_c_id = used_cards.get(hand_ind);
-                            int table_c_id = used_cards.get(table_ind);
-
-
-                            Log.d("i", "" + i_final);
-                            Log.d("hand_ind", "" + hand_ind);
                             takeCardWithAnim(0, i_final, hand_ind);
-
-
-
-
-                            // Abort Game if trap hit
-                            if(trap_set && i_final != 3){
-                                Log.d("falle", "Haha, so dummm!");
-                                forced_lost_index = 0;
-                                openGameOverDialog();
-                                return true;
-                            }
-
-                            // Reset Index
-                            sel_hand_c = -1;
-                            turn_ind += 1;
-                            if(chlopfed == turn_ind - n_players){
-                                Log.d("Game ", "Over");
-                                game_over = true;
-                                openGameOverDialog();
-                                return true;
-                            }
-
-                            // TODO: check if Falle, Hose oder Füür
-
-                            // Next player's turn
-                            nextTurn();
+                            moveNext(true);
                         }
                     }
                     return true;
                 } });
+        }
+    }
+
+    public void moveNext(boolean declare_first){
+
+        final Handler handler = new Handler();
+        int dec_delay = 800;
+
+        if(declare_first){
+            // Wait for declaration
+            if(pantsDown(0) || onFire(0)){
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        GameState gs = game.declare(declared);
+                        if(gs.game_over){
+                            game_over = true;
+                            openGameOverDialog();
+                            return;
+                        }
+                    }}, dec_delay);
+            } else {
+                dec_delay = 0;
+                GameState gs = game.declare(false);
+                if(gs.game_over){
+                    game_over = true;
+                    openGameOverDialog();
+                    return;
+                }
+            }
+
+        }
+
+        // Move other players
+        for(int i = 0; i < n_players - 1; ++i){
+            final int fin_i = i;
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    if(!game_over){
+                        GameState gs = game.findMoveAdvanced(fin_i + 1);
+                        if(gs.lastMove.knock){
+                            knock(fin_i + 1);
+                        } else if(gs.lastMove.take_all){
+                            setCardsAsDeck(true);
+                        } else {
+                            takeCardWithAnim(fin_i + 1, gs.lastMove.t_index, gs.lastMove.h_index);
+                        }
+                        if(gs.game_over){
+                            game_over = true;
+                            openGameOverDialog();
+                            return;
+                        }
+                    }
+                    if(fin_i == n_players - 2){
+                        your_turn = true;
+                    }
+                }}, (fin_i + 1) * 1000 + dec_delay);
         }
     }
 
@@ -251,13 +320,13 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         Log.d("openGame", "called");
 
         // Compute points of all players
-        Float[] scores = new Float[n_players];
-        for(int i = 0; i < n_players; ++i){
-            scores[i] = computeScore(i);
-        }
+        GameOverState gos = game.get_game_over_state();
+        Float[] scores = gos.scores;
+        int wrong_dec = gos.id_wrong_declared;
+        int firer = gos.id_fired;
 
         // Fire
-        if(fire_index >= 0){
+        if(firer >= 0){
             for(int i = 0; i < n_players; ++i){
                 if(i != fire_index){
                     scores[i] = 0.0f;
@@ -307,157 +376,9 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }
         game_over_data.putIntArray("cards", cards);
 
-
         // Add bundle and show
         goDialog.setArguments(game_over_data);
         goDialog.show(getSupportFragmentManager(),"GameOverDialog");
-    }
-
-    public void nextTurn(){
-        // Next player's turn
-        Handler handler = new Handler();
-        for(int k = 0; k < n_players - 1; ++k){
-            turn += 1;
-            final int final_k = k;
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    if(!game_over){
-                        makeMove(final_k);
-                        if(chlopfed == turn_ind - n_players){
-                            Log.d(ps[final_k + 1], "over wege chlopf");
-                            game_over = true;
-                        }
-                    }
-                }
-            }, (final_k + 1) * baseAnimTime * 2);
-        }
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                turn = 0;
-                if(game_over){
-                    openGameOverDialog();
-                }
-            }
-        }, (n_players) * baseAnimTime * 2);
-    }
-
-
-    public class Move{
-        Move(int t, int h, boolean hc, boolean fire, boolean ta, boolean hose){
-            table_index = t;
-            hand_index = h;
-            has_knocked = hc;
-            fired = fire;
-            take_all = ta;
-            has_hose = hose;
-        }
-        int table_index;
-        int hand_index;
-        boolean has_knocked;
-        boolean fired;
-        boolean take_all;
-        boolean has_hose;
-    }
-
-    // AI for other players
-    public Move findMove(int playerID){
-        // Random Move
-        Random gen = new Random();
-        final int table_index = gen.nextInt(4);
-        final int hand_index = gen.nextInt(3);
-        final boolean has_knocked = false;
-        final boolean fired = false;
-        final boolean ta = false;
-        final boolean h = false;
-        return new Move(table_index, hand_index, has_knocked, fired, ta, h);
-    }
-
-    public Move findMoveAdvanced(int playerID){
-
-        // Initialize
-        int table_index = -1;
-        int hand_index = -1;
-        boolean has_knocked = false;
-        boolean fired = false;
-        boolean ta = false;
-        boolean h = false;
-
-        // Knock if current score is higher than 26
-        final float curr_score = computeScore(playerID);
-        if(curr_score > 26.0f && turn_ind >= n_players){
-            return new Move(-1, -1, true, false, false, false);
-        }
-
-        // Compute best score after changing
-        int[] table_cards = new int[3];
-        int[] hand_cards = new int[3];
-        int table_base_ind = n_players * 3;
-        int hand_base_ind = playerID * 3;
-
-        // Copy current cards
-        for(int i = 0; i < 3; ++i){
-            table_cards[i] = used_cards.get(table_base_ind + i);
-            hand_cards[i] = used_cards.get(hand_base_ind + i);
-        }
-
-        // Try all swaps and choose the one yielding maximum score
-        float curr_max_score = curr_score;
-        float temp_score;
-        for(int i = 0; i < 3; ++i){
-            for(int k = 0; k < 3; ++k){
-                // Set card
-                used_cards.set(hand_base_ind + i, table_cards[k]);
-                temp_score = computeScore(playerID);
-                if(temp_score > curr_max_score){
-                    curr_max_score = temp_score;
-                    table_index = k;
-                    hand_index = i;
-                }
-                // Set back
-                used_cards.set(hand_base_ind + i, hand_cards[i]);
-            }
-        }
-
-        // Check Take all
-        for(int k = 0; k < 3; ++k) {
-            used_cards.set(hand_base_ind + k, table_cards[k]);
-        }
-        float take_all_score = computeScore(playerID);
-        if(take_all_score > curr_max_score){
-            ta = true;
-            curr_max_score = take_all_score;
-        }
-        for(int k = 0; k < 3; ++k){
-            used_cards.set(hand_base_ind + k, hand_cards[k]);
-        }
-
-        // Check for trap
-        if(trapOnTable()){
-            if(take_all_score > curr_score){
-                ta = true;
-                table_index = -1;
-                hand_index = -1;
-            } else {
-                table_index = 3;
-                hand_index = 0;
-            }
-        }
-
-        // Take hidden card
-        if(curr_max_score <= curr_score){
-            table_index = 3;
-            hand_index = 0;
-        }
-
-        // Check for fireButton or hose after moving
-        if(curr_max_score == 32.0f){
-            fired = true;
-        } else if(curr_max_score == 31.0f){
-            h = true;
-        }
-
-        // Return
-        return new Move(table_index, hand_index, has_knocked, fired, ta, h);
     }
 
     // Animation
@@ -469,11 +390,11 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         final int h_arr_ind = playerId * 3 + hand_index;
 
         // Get cards
-        final int hand_c_id = used_cards.get(h_arr_ind);
-        final int table_c_id = used_cards.get(t_arr_ind);
+        final int hand_c_id = used_cards.get(t_arr_ind);
+        final int table_c_id = used_cards.get(h_arr_ind);
 
         final int animTime = baseAnimTime;
-        ImageView pCardView = playerId == 0? hc_views[hand_index]: p_views[playerId - 1];
+        ImageView pCardView = playerId == 0 ? hc_views[hand_index]: p_views[playerId - 1];
         ImageView destView = tc_views[table_index];
 
         // Uncover player card if covered
@@ -485,6 +406,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
 
         final int p_fin = playerId - 1;
         final int t_ind = table_index;
+        Log.d("pfinn", ""+ p_fin);
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             public void run() {
@@ -501,223 +423,33 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
             }
             }
         }, animTime);
-
-        // Swap
-        used_cards.set(h_arr_ind, table_c_id);
-        used_cards.set(t_arr_ind, hand_c_id);
-    }
-
-    // Player actions
-    public void makeMove(int playerId){
-
-        if(game_over){
-            return;
-        }
-
-        // Find Move
-        Move nextMove = findMoveAdvanced(playerId + 1);
-
-        Log.d("Player ", " " + playerId);
-        Log.d("turn", "" + turn_ind);
-        Log.d("knockButton", "" + chlopfed);
-
-        final boolean k = nextMove.has_knocked;
-        final boolean fr = nextMove.fired;
-        final boolean t = nextMove.take_all;
-        final boolean hs = nextMove.has_hose;
-
-        // Check if knocked
-        if(k){
-            Log.d("Player " + (playerId + 1), " knocked");
-            knock(playerId + 1);
-            return;
-        }
-        // Take all cards
-        if(t){
-            Log.d("Player " + (playerId + 1), " took all");
-            takeAll(playerId + 1);
-            // TODO: animate
-            return;
-        }
-
-        final boolean trap_set = trapOnTable();
-
-        final int table_index = nextMove.table_index;
-        final int hand_index = nextMove.hand_index;
-
-        takeCardWithAnim(playerId + 1, table_index, hand_index);
-
-        // Check if fireButton or hose after moving
-        if(fr){
-            Log.d("Player " + (playerId + 1), " fired");
-            if(onFire(playerId + 1)){
-                fire_index = playerId + 1;
-            } else {
-                forced_lost_index = playerId + 1;
-            }
-            game_over = true;
-            return;
-        }
-        if(hs){
-            Log.d("Player " + (playerId + 1), " hosed");
-            if(pantsDown(playerId + 1)){
-                hose_index = playerId + 1;
-                ImageView player_card_view = p_views[playerId];
-                setTextViewBelowImgView(player_card_view, R.string.pants_down, false);
-            } else {
-                forced_lost_index = playerId + 1;
-            }
-            game_over = true;
-            return;
-        }
-
-        // Check for traps
-        if(trap_set && !t && table_index != 3){
-            Log.d("falle", "Haha, so dummm!");
-            forced_lost_index = playerId + 1;
-            game_over = true;
-            return;
-        }
-
-        // Next turn
-        turn_ind += 1;
-
     }
 
     public void knock(int playerId){
-        if(turn_ind < n_players){
-            throw new IllegalStateException("Cannot knock now!");
-        }
         if(playerId > 0){
             ImageView player_card_view = p_views[playerId - 1];
             setTextViewBelowImgView(player_card_view, R.string.knocker, true);
         }
-        if(chlopfed < 0){
-            chlopfed = turn_ind;
-        }
-        turn_ind += 1;
-        turn += 1;
-    }
-
-    public void takeAll(int playerID){
-        for(int i = 0; i < 3; ++i){
-            final int hand_arr_ind = playerID * 3 + i;
-            final int curr_hand_card_id = used_cards.get(hand_arr_ind);
-            final int table_arr_ind = n_play_cs + i;
-            final int curr_table_card_id = used_cards.get(table_arr_ind);
-            used_cards.set(table_arr_ind, curr_hand_card_id);
-            used_cards.set(hand_arr_ind, curr_table_card_id);
-            setCard(curr_hand_card_id, i, false);
-            if(playerID == 0){
-                setCard(curr_table_card_id, i, true);
-            }
-        }
-        // TODO: animate
-        turn_ind += 1;
     }
 
     // Button methods
     public void knockButton(View view) {
-        if(turn_ind >= n_players){
-            if(turn == 0){
-                knock(0);
-                nextTurn();
-            }
+        if(game.turn_ind > n_players){
+            your_turn = false;
+            game.make_move(true, false, -1, -1);
+            moveNext(true);
         }
     }
 
     public void takeAllButton(View view) {
-        if(turn == 0){
-            takeAll(0);
-            nextTurn();
-        }
+        your_turn = false;
+        game.make_move(false, true, -1, -1);
+        setCardsAsDeck(true);
+        moveNext(true);
     }
 
     public void fireButton(View view) {
-        final boolean hose = pantsDown(0);
-        final boolean on_fire = onFire(0);
-
-        if(on_fire){
-            fire_index = 0;
-            Log.d("fireButton", "Niiiice");
-        } else if(hose){
-            hose_index = 0;
-            Log.d("hose", "Niiiice");
-        } else {
-            forced_lost_index = 0;
-            Log.d("fireButton", "Du suuugsch");
-        }
-        game_over = true;
-        //openGameOverDialog();
-    }
-
-    // Scoring functions
-    public float computeScore(int playerID){
-
-        // Hose
-        if(pantsDown(playerID)){
-            return 31.0f;
-        }
-
-        // Füür
-        if(onFire(playerID)){
-            return 32.0f;
-        }
-
-        // Gliichi Zahl
-        if(check30andHalf(playerID)){
-            return 30.5f;
-        }
-
-        int[] col_points = new int[4];
-        for(int i = 0; i < 4; ++i){
-            col_points[i] = 0;
-        }
-        for(int i = 0; i < 3; ++i){
-            final int hand_arr_ind = playerID * 3 + i;
-            final int curr_hand_card_id = used_cards.get(hand_arr_ind);
-            final int curr_number = curr_hand_card_id % 9;
-            final int curr_color = curr_hand_card_id / 9;
-            col_points[curr_color] += cards.card_id_to_value(curr_number);
-        }
-        int currMax = col_points[0];
-        for(int i = 0; i < 3; ++i){
-            final int curr_val = col_points[i + 1];
-            if(curr_val > currMax){
-                currMax = curr_val;
-            }
-        }
-        return (float) currMax;
-    }
-
-    public boolean check30andHalf(int playerID){
-        final int first_card_arr_ind = playerID * 3;
-        final int first_card_id = used_cards.get(first_card_arr_ind);
-        int number = first_card_id % 9;
-        for(int i = 0; i < 3; ++i){
-            final int hand_arr_ind = playerID * 3 + i;
-            final int curr_hand_card_id = used_cards.get(hand_arr_ind);
-            final int curr_number = curr_hand_card_id % 9;
-            if(number != curr_number){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean oneColor(int playerID){
-        final int first_card_arr_ind = playerID * 3;
-        final int first_card_id = used_cards.get(first_card_arr_ind);
-        final int color = first_card_id / 9;
-        for(int i = 0; i < 3; ++i){
-            final int hand_arr_ind = playerID * 3 + i;
-            final int curr_hand_card_id = used_cards.get(hand_arr_ind);
-            final int curr_color = curr_hand_card_id / 9;
-            if(curr_color != color) {
-                return false;
-            }
-        }
-        return true;
+        declared = true;
     }
 
     public boolean onFire(int playerID){
@@ -754,14 +486,6 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
             return true;
         }
         return false;
-    }
-
-    public boolean trapOnTable(){
-        if(check30andHalf(4)){
-            return true;
-        } else {
-            return oneColor(4);
-        }
     }
 
     // Image view helper functions
@@ -846,6 +570,13 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     public void setPlayerBG(int p_ind){
         Bitmap card_bmp = cards.getCardBackground();
         p_views[p_ind].setImageBitmap(card_bmp);
+    }
+
+    public void setTableCardsToBG(){
+        Bitmap card_bmp = cards.getCardBackground();
+        for(int i = 0; i < 3; ++i){
+            tc_views[i].setImageBitmap(card_bmp);
+        }
     }
 
     public void setPlayerBGImages(){

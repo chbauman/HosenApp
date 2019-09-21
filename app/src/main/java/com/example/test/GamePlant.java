@@ -25,6 +25,7 @@ public class GamePlant {
 
     // Internal state variables
     private boolean declaration_pending;
+    Move lastMove;
 
     // Start variables
     boolean chose_stack;
@@ -58,7 +59,7 @@ public class GamePlant {
 
         // Set states
         turn_ind = 0;
-        knock_ind = -10 - n_players;
+        knock_ind = 1000;
         beginner_ind = (beginner_ind + 1) % n_players;
 
         declaration_pending = false;
@@ -82,6 +83,9 @@ public class GamePlant {
     // Make a move, either knock, take all or
     // specify which card to take and give.
     public void make_move(boolean knock, boolean take_all, int hand_ind, int table_ind){
+        if(game_over){
+            throw new IllegalStateException("Game is fucking over!");
+        }
         if(declaration_pending){
             throw new IllegalStateException("Need to make a declaration first!");
         } else if(knock && take_all){
@@ -90,19 +94,27 @@ public class GamePlant {
             throw new IllegalStateException("First player must choose stack first.");
         }
 
+        lastMove = new Move(knock, take_all, hand_ind, table_ind);
+
         final int player_id = (beginner_ind + turn_ind) % n_players;
 
+        Log.d("Player", "" + player_id);
         if(take_all){
             // Take all cards
             take_all(player_id);
+            Log.d("Took all", "now");
         } else if(knock){
             // Cannot knock in first round
+            Log.d("Knocked", "now");
             if(turn_ind < n_players + 1){
                 throw new IllegalStateException("Too early to knock you bastard!!");
             }
             // Knock
-            knock_ind = turn_ind;
+            if(knock_ind == 1000){
+                knock_ind = turn_ind;
+            }
         } else {
+            Log.d("Took single card", "now");
             // Check if trap was set
             if(trapOnTable()) {
                 id_caught_in_trap = player_id;
@@ -136,10 +148,10 @@ public class GamePlant {
 
         declaration_pending = false;
         turn_ind++;
-        if(turn_ind == knock_ind + n_players){
+        if(turn_ind >= knock_ind + n_players){
             game_over = true;
         }
-        return new GameState(turn_ind, knock_ind, game_over, used_cards);
+        return new GameState(turn_ind, knock_ind, game_over, used_cards, lastMove);
     }
 
     // Get information about the end of the game
@@ -148,15 +160,23 @@ public class GamePlant {
             throw new IllegalStateException("Game not yet over!!");
         }
 
-        float[] scores = new float[n_players];
+        Float[] scores = new Float[n_players];
         for(int i = 0; i < n_players; ++i){
             scores[i] = computeScore(i);
         }
-        return new GameOverState(id_caught_in_trap, id_fired, id_wrong_declared, used_cards, scores);
+        return new GameOverState(id_caught_in_trap, id_fired, id_wrong_declared, used_cards, scores, turn_ind);
     }
 
     // Automatic moving
-    public void findMoveAdvanced(int playerID){
+    public GameState findMoveAdvanced(int playerID){
+
+        final int player_id = (beginner_ind + turn_ind) % n_players;
+        if(player_id != playerID){
+            Log.d("turn_id", "" + turn_ind);
+            Log.d("beginner_ind", "" + beginner_ind);
+            Log.d("playerID", "" + playerID);
+            throw new IllegalStateException("Not this player's turn");
+        }
 
         // Initialize
         int table_index = -1;
@@ -231,13 +251,18 @@ public class GamePlant {
 
         // Move
         Log.d("now", "moving");
+        Move m;
         if(has_knocked){
             make_move(true, false, -1, -1);
+            m = new Move(true, false, -1, -1);
         } else if(ta){
             make_move(false, true, -1, -1);
+            m = new Move(false, true, -1, -1);
         } else {
             make_move(false, false, hand_index, table_index);
+            m = new Move(false, false, hand_index, table_index);
         }
+        lastMove = m;
 
         // Check for fire or pants down
         float score_after = computeScore(playerID);
@@ -248,7 +273,7 @@ public class GamePlant {
 
         Log.d("now", "declaring");
         // Declare
-        declare(dec);
+        return declare(dec);
     }
 
     // Actions
