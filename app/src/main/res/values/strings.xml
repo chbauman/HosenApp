@@ -13,4 +13,7 @@
     <string name="pants_down">Höös</string>
     <string name="lost">Verloore</string>
     <string name="fire">Füür</string>
+    <string name="change_cards">Wetsch Wechsle?</string>
+    <string name="yes">Joo</string>
+    <string name="no">Neiii</string>
 </resources>

@@ -134,6 +134,8 @@ public class GamePlant {
 
         final int player_id = (beginner_ind + turn_ind) % n_players;
         if(pants_or_fire){
+            Log.d("Player", "" + player_id);
+            Log.d("declaring", "füür oder so");
             if(onFire(player_id)){
                 id_fired = player_id;
             } else if(!pantsDown(player_id)){

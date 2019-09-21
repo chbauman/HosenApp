@@ -180,8 +180,8 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
             }
         };
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Change cards?").setPositiveButton("Yes", dialogClickListener)
-                .setNegativeButton("No", dialogClickListener).show();
+        builder.setMessage(getString(R.string.change_cards)).setPositiveButton(getString(R.string.yes), dialogClickListener)
+                .setNegativeButton(getString(R.string.no), dialogClickListener).show();
     }
 
     @TargetApi(21)
