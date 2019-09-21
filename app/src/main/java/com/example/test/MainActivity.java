@@ -181,7 +181,11 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         };
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(getString(R.string.change_cards)).setPositiveButton(getString(R.string.yes), dialogClickListener)
-                .setNegativeButton(getString(R.string.no), dialogClickListener).show();
+                .setNegativeButton(getString(R.string.no), dialogClickListener);
+        builder.setCancelable(false);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.show();
     }
 
     @TargetApi(21)
@@ -316,6 +320,16 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     }
 
     public void openGameOverDialog(){
+        final Handler handler = new Handler();
+        int dec_delay = 1300;
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                // first move (switching cards)
+                openGameOverDialogNonDelayed();
+            }}, dec_delay);
+    }
+
+    public void openGameOverDialogNonDelayed(){
 
         Log.d("openGame", "called");
 
@@ -333,14 +347,17 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
                 }
             }
         }
-        else {
+        else if(gos.n_turns > n_players){
             // Trap or wrongly announced hose or fireButton
-            if (forced_lost_index >= 0) {
-                scores[forced_lost_index] = 0.0f;
+            if (wrong_dec >= 0) {
+                scores[wrong_dec] = 0.0f;
+            }
+            if(gos.id_caught_in_trap >= 0){
+                scores[gos.id_caught_in_trap] = 0.0f;
             }
             // Unannounced hose or fireButton
             for (int i = 0; i < n_players; ++i) {
-                if (i != hose_index && (pantsDown(i) || onFire(i))) {
+                if (i != gos.id_pants && (pantsDown(i) || onFire(i))) {
                     Log.d("unannounced", ps[i]);
                     scores[i] = 0.0f;
                 }

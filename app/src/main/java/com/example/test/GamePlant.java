@@ -33,6 +33,7 @@ public class GamePlant {
     // End of game state variables
     int id_caught_in_trap;
     int id_fired;
+    int id_pants;
     int id_wrong_declared;
     boolean game_over;
 
@@ -65,6 +66,7 @@ public class GamePlant {
         declaration_pending = false;
         id_caught_in_trap = -1;
         id_fired = -1;
+        id_pants = -1;
         id_wrong_declared = -1;
         game_over = false;
         chose_stack = false;
@@ -140,6 +142,8 @@ public class GamePlant {
                 id_fired = player_id;
             } else if(!pantsDown(player_id)){
                 id_wrong_declared = player_id;
+            } else {
+                id_pants = player_id;
             }
             game_over = true;
         }
@@ -166,7 +170,7 @@ public class GamePlant {
         for(int i = 0; i < n_players; ++i){
             scores[i] = computeScore(i);
         }
-        return new GameOverState(id_caught_in_trap, id_fired, id_wrong_declared, used_cards, scores, turn_ind);
+        return new GameOverState(id_caught_in_trap, id_fired, id_wrong_declared, used_cards, scores, turn_ind, id_pants);
     }
 
     // Automatic moving
