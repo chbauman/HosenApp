@@ -455,52 +455,6 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     }
 
     // Animation
-    public void takeSingleCardWithAnim(int playerId, int table_index, int hand_index){
-
-        Log.d(ps[playerId], "taking card " + table_index);
-        final int t_arr_ind = n_play_cs + table_index;
-        final int h_arr_ind = playerId * 3 + hand_index;
-
-        // Swap
-        final int hand_c_id = used_cards.get(h_arr_ind);
-        final int table_c_id = used_cards.get(t_arr_ind);
-
-        if(playerId != 0) {
-            // Animate
-            final int animTime = baseAnimTime;
-            ImageView playerView = p_views[playerId - 1];
-            ImageView destView = tc_views[table_index];
-            TranslateAnimation anim = Util.getLinearAnim(playerView, destView, animTime);
-
-            //Start animation
-            playerView.startAnimation(anim);
-            if (table_index != 3) {
-                final int t_ind = table_index;
-                final int p_fin = playerId - 1;
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    public void run() {
-                        setCard(hand_c_id, t_ind, false);
-                        setPlayerBG(p_fin);
-                    }
-                }, animTime);
-            }
-            if(table_index != 3){
-                setPlayerCard(playerId - 1, hand_c_id);
-            }
-        } else {
-            if(table_index != 3){
-                setCard(hand_c_id, table_index, false);
-            }
-            setCard(table_c_id, h_arr_ind, true);
-        }
-
-        // Swap
-        used_cards.set(h_arr_ind, table_c_id);
-        used_cards.set(t_arr_ind, hand_c_id);
-    }
-
-    // Animation
     public void takeCardWithAnim(int playerId, int table_index, int hand_index){
 
         Log.d(ps[playerId], "taking card " + table_index);
@@ -585,7 +539,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         final int table_index = nextMove.table_index;
         final int hand_index = nextMove.hand_index;
 
-        takeSingleCardWithAnim(playerId + 1, table_index, hand_index);
+        takeCardWithAnim(playerId + 1, table_index, hand_index);
 
         // Check if fireButton or hose after moving
         if(fr){
@@ -718,7 +672,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
             final int curr_hand_card_id = used_cards.get(hand_arr_ind);
             final int curr_number = curr_hand_card_id % 9;
             final int curr_color = curr_hand_card_id / 9;
-            col_points[curr_color] += card_id_to_value(curr_number);
+            col_points[curr_color] += cards.card_id_to_value(curr_number);
         }
         int currMax = col_points[0];
         for(int i = 0; i < 3; ++i){
@@ -803,18 +757,6 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
             return oneColor(4);
         }
     }
-
-    // Helper functions
-    public int card_id_to_value(int card_id){
-        if(card_id == 0){
-            return 11;
-        } else if(card_id > 4){
-            return 10;
-        } else {
-            return card_id + 5;
-        }
-    }
-
 
     // Image view helper functions
     public void setTextViewBelowImgView(ImageView iv, int s, boolean add_bw_anim){
@@ -910,14 +852,9 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     public void setCard(int card_id, int view_array_id, boolean hand){
         Bitmap card_bmp = cards.getCard(card_id);
         if(view_array_id == 3){
-            Matrix matrix = new Matrix();
-            matrix.postRotate(90);
-            card_bmp = Bitmap.createBitmap(card_bmp, 0, 0, card_bmp.getWidth(), card_bmp.getHeight(), matrix, true);
+            card_bmp = cards.rotateBitmap(card_bmp);
         }
-        if(hand){
-            hc_views[view_array_id].setImageBitmap(card_bmp);
-        } else {
-            tc_views[view_array_id].setImageBitmap(card_bmp);
-        }
+        ImageView[] v_arr = hand? hc_views: tc_views;
+        v_arr[view_array_id].setImageBitmap(card_bmp);
     }
 }
