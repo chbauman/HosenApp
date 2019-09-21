@@ -1,6 +1,7 @@
 package com.example.test;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,12 +17,14 @@ public class MyAdapter extends ArrayAdapter<String> {
     private LayoutInflater layoutInflater;
     private Bundle b;
     private Context c;
+    Cards cards;
 
     MyAdapter(Context c, String[] dummy, Bundle b) {
         super(c, R.layout.list_row, R.id.list_title_id, dummy);
         layoutInflater = LayoutInflater.from(c);
         this.b = b;
         this.c = c;
+        cards = new Cards(c);
     }
 
     @NonNull
@@ -34,7 +37,7 @@ public class MyAdapter extends ArrayAdapter<String> {
         float[] scores = b.getFloatArray("player_scores");
         String[] titleArr = b.getStringArray("player_names");
         int[] ids = b.getIntArray("player_ids");
-        int[] cards = b.getIntArray("cards");
+        int[] cards_ids = b.getIntArray("cards");
         int n_players = b.getInt("n_players");
 
         // Find Views
@@ -47,7 +50,11 @@ public class MyAdapter extends ArrayAdapter<String> {
         cardViews[2] = row.findViewById(R.id.fc3);
 
         // Set cards
-        // TODO
+        for(int i = 0; i < 3; ++i){
+            int card_ind = ids[position] * 3 + i;
+            Bitmap card_bmp = cards.getCard(cards_ids[card_ind]);
+            cardViews[i].setImageBitmap(card_bmp);
+        }
 
         // Set name of player and score
         if(titleArr != null && scores != null){
