@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     int n_play_cs;
     final int n_players = 4;
     final int n_cards = 36;
-    final int baseAnimTime = 500;
+    final int baseAnimTime = 1000;
     final String[] ps = {"Ich", "Hansli", "Peter", "Ruedi"};
 
     // Cards that are in the game
@@ -289,7 +289,6 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
                     return;
                 }
             }
-
         }
 
         // Move other players
@@ -302,7 +301,13 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
                         if(gs.lastMove.knock){
                             knock(fin_i + 1);
                         } else if(gs.lastMove.take_all){
-                            setCardsAsDeck(true);
+                            final Handler handler = new Handler();
+                            int dec_delay = baseAnimTime / 2 + 100;
+                            takeAllAnim(fin_i + 1);
+                            handler.postDelayed(new Runnable() {
+                                public void run() {
+                                    setCardsAsDeck(true);
+                                }}, dec_delay);
                         } else {
                             takeCardWithAnim(fin_i + 1, gs.lastMove.t_index, gs.lastMove.h_index);
                         }
@@ -320,6 +325,12 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     }
 
     public void openGameOverDialog(){
+        GameOverState gos = game.get_game_over_state();
+        if(gos.id_pants >= 0){
+            pantsDownAnim(gos.id_pants);
+        } else if(gos.id_fired >= 0){
+            fireAnim(gos.id_fired);
+        }
         final Handler handler = new Handler();
         int dec_delay = 1300;
         handler.postDelayed(new Runnable() {
@@ -410,7 +421,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         final int hand_c_id = used_cards.get(t_arr_ind);
         final int table_c_id = used_cards.get(h_arr_ind);
 
-        final int animTime = baseAnimTime;
+        final int animTime = baseAnimTime / 2;
         ImageView pCardView = playerId == 0 ? hc_views[hand_index]: p_views[playerId - 1];
         ImageView destView = tc_views[table_index];
 
@@ -418,12 +429,13 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         if(table_index != 3 && playerId != 0){
             setPlayerCard(playerId - 1, hand_c_id);
         }
-        TranslateAnimation anim = Util.getLinearAnim(pCardView, destView, animTime);
+
+        // Animate
+        Animation anim = Util.getLinearAnim(pCardView, destView, animTime, true);
         pCardView.startAnimation(anim);
 
         final int p_fin = playerId - 1;
         final int t_ind = table_index;
-        Log.d("pfinn", ""+ p_fin);
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             public void run() {
@@ -439,13 +451,79 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
                 setCard(table_c_id, h_arr_ind, true);
             }
             }
-        }, animTime);
+        }, animTime + 100);
     }
 
     public void knock(int playerId){
+        ImageView player_card_view = playerId == 0? hc_views[1]: p_views[playerId - 1];
+        setTextViewBelowImgView(player_card_view, R.string.knocker, true);
+    }
+
+    public void pantsDownAnim(int playerId){
+        ImageView player_card_view = playerId == 0? hc_views[1]: p_views[playerId - 1];
+        setTextViewBelowImgView(player_card_view, R.string.pants_down, false);
+    }
+
+    public void fireAnim(int playerId){
+        ImageView player_card_view = playerId == 0? hc_views[1]: p_views[playerId - 1];
+        setTextViewBelowImgView(player_card_view, R.string.fire, false);
+    }
+
+    public void takeAllAnim(int playerId){
+        ImageView[] tempIvs = new ImageView[3];
+        int hth = 0;
+        int wth = 0;
+        float x = 0.0f;
+        float y = 0.0f;
+        if(playerId != 0){
+            ImageView p_v = p_views[playerId - 1];
+            tempIvs[2] = p_v;
+
+            RelativeLayout rl = findViewById(R.id.main_layout);
+            int top_dist = p_v.getTop();
+            int left_dist = p_v.getLeft();
+            hth = p_v.getHeight();
+            wth = p_v.getWidth();
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(wth, hth);
+            params.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+            params.leftMargin = left_dist;
+            params.topMargin = top_dist;
+            x = left_dist;
+            y = top_dist;
+
+            Bitmap card_bmp = cards.getCardBackground();
+            for(int i = 0; i < 2; ++i){
+                // Add ImageView
+                tempIvs[i] = new ImageView(this);
+                tempIvs[i].setImageBitmap(card_bmp);
+                rl.addView(tempIvs[i], params);
+                tempIvs[i].measure(wth, hth);
+            }
+        }
+
+        for(int i = 0; i < 3; ++i){
+            ImageView iv1 = playerId == 0? hc_views[i]: tempIvs[i];
+            ImageView iv2 = tc_views[i];
+            Animation anim;
+            if(playerId == 0){
+                anim = Util.getLinearAnim(iv1, iv2, baseAnimTime / 2, true);
+            } else {
+                anim = Util.getLinearAnimFromParams(iv1, iv2, baseAnimTime / 2, true, (float) hth, (float) wth, x, y);
+            }
+            iv1.startAnimation(anim);
+        }
+
         if(playerId > 0){
-            ImageView player_card_view = p_views[playerId - 1];
-            setTextViewBelowImgView(player_card_view, R.string.knocker, true);
+            final Handler handler = new Handler();
+            int dec_delay = baseAnimTime + 150;
+            final ImageView iv1 = tempIvs[0];
+            final ImageView iv2 = tempIvs[1];
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    ViewGroup vg = (ViewGroup)(iv2.getParent());
+                    vg.removeView(iv1);
+                    vg.removeView(iv2);
+                }}, dec_delay);
         }
     }
 
@@ -453,6 +531,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     public void knockButton(View view) {
         if(game.turn_ind > n_players){
             your_turn = false;
+            knock(0);
             game.make_move(true, false, -1, -1);
             moveNext(true);
         }
@@ -461,7 +540,13 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     public void takeAllButton(View view) {
         your_turn = false;
         game.make_move(false, true, -1, -1);
-        setCardsAsDeck(true);
+        final Handler handler = new Handler();
+        int dec_delay = baseAnimTime / 2 + 100;
+        takeAllAnim(0);
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                setCardsAsDeck(true);
+            }}, dec_delay);
         moveNext(true);
     }
 
