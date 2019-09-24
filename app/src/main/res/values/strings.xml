@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Test</string>
+    <string name="app_name">HosenApp</string>
     <string name="action_settings">Settings</string>
     <string name="hose_str">Hosenabe</string>
     <string name="score_str">%1$.2f Pünkt.</string>
