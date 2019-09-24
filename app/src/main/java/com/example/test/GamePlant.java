@@ -118,7 +118,8 @@ public class GamePlant {
         } else {
             Log.d("Took single card", "now");
             // Check if trap was set
-            if(trapOnTable()) {
+            if(table_ind != 3 && trapOnTable()) {
+                Log.d("Caught player", "in trap");
                 id_caught_in_trap = player_id;
             }
             // Swap cards

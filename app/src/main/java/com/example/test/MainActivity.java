@@ -353,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         // Fire
         if(firer >= 0){
             for(int i = 0; i < n_players; ++i){
-                if(i != fire_index){
+                if(i != firer){
                     scores[i] = 0.0f;
                 }
             }
