@@ -283,6 +283,13 @@ public class GamePlant {
         return declare(dec);
     }
 
+    public boolean chooseStackAI(int playerID){
+        final float curr_score = computeScore(playerID);
+        final boolean res = curr_score < 17.0f;
+        choose_stack(res);
+        return res;
+    }
+
     // Actions
     public void take_single(int player_id, int hand_ind, int table_ind){
 

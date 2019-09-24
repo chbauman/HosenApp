@@ -76,9 +76,6 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
 
     // End game states
     boolean game_over = false;
-    int fire_index = -1;
-    int forced_lost_index = -1;
-    int hose_index = -1;
 
     // Who's turn is it
     // 0: You
@@ -109,9 +106,6 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         game_over = false;
 
         turn = 0;
-        forced_lost_index = -1;
-        fire_index = -1;
-        hose_index = -1;
 
         // Remove texts
         Iterator itr = addedTextsViews.iterator();
@@ -128,20 +122,55 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
 
         // Start new game
         game.startGame();
-        game.beginner_ind = 0;
+        //game.beginner_ind = 0;
         used_cards = game.used_cards;
+        starting_player = game.beginner_ind;
+        Log.d("beginning player: ", "" + starting_player);
 
         setCardsAsDeck(false);
 
-        // Wait for declaration
-        final Handler handler = new Handler();
-        int dec_delay = 2000;
-        handler.postDelayed(new Runnable() {
+        if(starting_player == 0){
+            // Wait for declaration
+            final Handler handler = new Handler();
+            int dec_delay = 2000;
+            handler.postDelayed(new Runnable() {
                 public void run() {
                     // first move (switching cards)
                     changeCardsDialog();
                 }}, dec_delay);
-
+        } else {
+            // Swap or not
+            int base_delay = 500;
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    setTextViewBelowImgView(p_views[starting_player - 1], R.string.starting_player, true);
+                }}, 200);
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    removeFirstText();
+                }}, 5000);
+            boolean switch_stack = game.chooseStackAI(starting_player);
+            if(switch_stack){
+                int dec_delay = baseAnimTime + 200 + base_delay;
+                int half_anim_delay = baseAnimTime / 2 + 100 + base_delay;
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        takeAllAnim(starting_player);
+                    }}, base_delay);
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        setCardsAsDeck(true);
+                    }}, half_anim_delay);
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        moveNext(false, starting_player);
+                    }}, dec_delay);
+            } else {
+                setCardsAsDeck(true);
+                moveNext(false, starting_player);
+            }
+        }
     }
 
     public void setCardsAsDeck(boolean open_table){
@@ -165,16 +194,30 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                final Handler handler = new Handler();
+                int base_delay = 500;
+                int dec_delay = baseAnimTime + 200 + base_delay;
+                int half_anim_delay = baseAnimTime / 2 + 100 + base_delay;
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
                         game.choose_stack(true);
-                        setCardsAsDeck(true);
-                        moveNext(false);
+                        handler.postDelayed(new Runnable() {
+                            public void run() {
+                                takeAllAnim(0);
+                            }}, base_delay);
+                        handler.postDelayed(new Runnable() {
+                            public void run() {
+                                setCardsAsDeck(true);
+                            }}, half_anim_delay);
+                        handler.postDelayed(new Runnable() {
+                            public void run() {
+                                moveNext(false, 0);
+                            }}, dec_delay);
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
                         game.choose_stack(false);
                         setCardsAsDeck(true);
-                        moveNext(false);
+                        moveNext(false, 0);
                         break;
                 }
             }
@@ -255,7 +298,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
                             game.make_move(false, false, sel_hand_c, i_final);
                             int hand_ind = sel_hand_c;
                             takeCardWithAnim(0, i_final, hand_ind);
-                            moveNext(true);
+                            moveNext(true, 0);
                         }
                     }
                     return true;
@@ -263,12 +306,12 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }
     }
 
-    public void moveNext(boolean declare_first){
+    public void moveNext(boolean declare_first, int player_ind){
 
         final Handler handler = new Handler();
         int dec_delay = 800;
 
-        if(declare_first){
+        if(declare_first && player_ind == 0){
             // Wait for declaration
             if(pantsDown(0) || onFire(0)){
                 handler.postDelayed(new Runnable() {
@@ -292,8 +335,9 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }
 
         // Move other players
-        for(int i = 0; i < n_players - 1; ++i){
+        for(int i = player_ind; i < n_players - 1; ++i){
             final int fin_i = i;
+            final int dec_i = i - player_ind - (player_ind > 0? 1: 0);
             handler.postDelayed(new Runnable() {
                 public void run() {
                     if(!game_over){
@@ -320,7 +364,10 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
                     if(fin_i == n_players - 2){
                         your_turn = true;
                     }
-                }}, (fin_i + 1) * 1000 + dec_delay);
+                }}, (dec_i + 1) * 1000 + dec_delay);
+        }
+        if(player_ind == n_players - 1){
+            your_turn = true;
         }
     }
 
@@ -533,7 +580,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
             your_turn = false;
             knock(0);
             game.make_move(true, false, -1, -1);
-            moveNext(true);
+            moveNext(true, 0);
         }
     }
 
@@ -548,7 +595,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
                 public void run() {
                     setCardsAsDeck(true);
                 }}, dec_delay);
-            moveNext(true);
+            moveNext(true, 0);
         }
     }
 
@@ -596,12 +643,13 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     public void setTextViewBelowImgView(ImageView iv, int s, boolean add_bw_anim){
 
         RelativeLayout rl = findViewById(R.id.main_layout);
+        rl.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         int l_w = rl.getWidth();
         int l_h = rl.getHeight();
 
         int top_dist = iv.getTop();
         int left_dist = iv.getLeft();
-        top_dist += iv.getHeight();
+        top_dist += iv.getLayoutParams().height;
 
         // Add TextView
         TextView tv = new TextView(this);
@@ -658,6 +706,14 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         tv.startAnimation(animSet);
     }
 
+    public void removeFirstText(){
+        if(addedTextsViews.size() > 0){
+            TextView iv = addedTextsViews.get(0);
+            ViewGroup vg = (ViewGroup)(iv.getParent());
+            vg.removeView(iv);
+            addedTextsViews.remove(0);
+        }
+    }
     public void setHidden(){
         Bitmap card_bmp = cards.getCardBackground();
         Matrix matrix = new Matrix();
