@@ -538,16 +538,18 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     }
 
     public void takeAllButton(View view) {
-        your_turn = false;
-        game.make_move(false, true, -1, -1);
-        final Handler handler = new Handler();
-        int dec_delay = baseAnimTime / 2 + 100;
-        takeAllAnim(0);
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                setCardsAsDeck(true);
-            }}, dec_delay);
-        moveNext(true);
+        if(your_turn){
+            your_turn = false;
+            game.make_move(false, true, -1, -1);
+            final Handler handler = new Handler();
+            int dec_delay = baseAnimTime / 2 + 100;
+            takeAllAnim(0);
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    setCardsAsDeck(true);
+                }}, dec_delay);
+            moveNext(true);
+        }
     }
 
     public void fireButton(View view) {
