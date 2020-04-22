@@ -10,6 +10,9 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
 import android.widget.ImageView;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 
 public class Cards {
 
@@ -18,7 +21,7 @@ public class Cards {
 
     // Constructor
     @TargetApi(21)
-    Cards(Context c) {
+    Cards(@NotNull Context c) {
         Resources res = c.getResources();
         Drawable drawable = res.getDrawable(R.drawable.ic_card_deck_161536, c.getTheme());
         VectorDrawable vectorDrawable = (VectorDrawable) drawable;
@@ -26,7 +29,7 @@ public class Cards {
     }
 
     // Public methods
-    public void setImageView(ImageView iv, int ind) {
+    public void setImageView(@NotNull ImageView iv, int ind) {
         Bitmap card_bmp = getCard(ind);
         iv.setImageBitmap(card_bmp);
     }
@@ -45,6 +48,7 @@ public class Cards {
     }
 
     // Helper functions
+    @Contract(pure = true)
     static int card_id_to_value(int card_id) {
         if (card_id == 0) {
             return 11;
@@ -69,7 +73,7 @@ public class Cards {
         return mBitmap;
     }
 
-    private Bitmap getBitmap(VectorDrawable vectorDrawable, int h, int w) {
+    private Bitmap getBitmap(@NotNull VectorDrawable vectorDrawable, int h, int w) {
         Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());

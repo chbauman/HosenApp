@@ -51,7 +51,9 @@ public class MyAdapter extends ArrayAdapter<String> {
 
         // Set cards
         for (int i = 0; i < 3; ++i) {
+            assert ids != null;
             int card_ind = ids[position] * 3 + i;
+            assert cards_ids != null;
             Bitmap card_bmp = cards.getCard(cards_ids[card_ind]);
             cardViews[i].setImageBitmap(card_bmp);
         }

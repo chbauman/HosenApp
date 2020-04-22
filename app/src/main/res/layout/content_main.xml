@@ -54,7 +54,8 @@
         android:layout_marginBottom="10dp"
         app:layout_constraintBottom_toTopOf="@+id/card2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/entwurf" />
+        app:srcCompat="@drawable/entwurf"
+        android:contentDescription="@string/covered_card" />
 
     <ImageView
         android:id="@+id/p1"
@@ -73,7 +74,8 @@
         android:layout_height="81dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-        app:srcCompat="@drawable/entwurf" />
+        app:srcCompat="@drawable/entwurf"
+        android:contentDescription="@string/middle_opponent" />
 
     <ImageView
         android:id="@+id/p3"
@@ -85,7 +87,8 @@
         android:layout_marginRight="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/entwurf" />
+        app:srcCompat="@drawable/entwurf"
+        android:layout_alignParentRight="true" />
 
     <ImageView
         android:id="@+id/card1"
@@ -109,7 +112,8 @@
         app:layout_constraintBottom_toTopOf="@+id/tkall"
         app:layout_constraintEnd_toStartOf="@+id/card3"
         app:layout_constraintStart_toEndOf="@+id/card1"
-        app:srcCompat="@drawable/entwurf" />
+        app:srcCompat="@drawable/entwurf"
+        android:contentDescription="@string/middle_card" />
 
     <ImageView
         android:id="@+id/card3"

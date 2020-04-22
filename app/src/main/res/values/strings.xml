@@ -17,4 +17,7 @@
     <string name="yes">Joo</string>
     <string name="no">Neiii</string>
     <string name="starting_player">Aafänger</string>
+    <string name="covered_card">Covered Card</string>
+    <string name="middle_card">Middle Card</string>
+    <string name="middle_opponent">Middle Opponent</string>
 </resources>
