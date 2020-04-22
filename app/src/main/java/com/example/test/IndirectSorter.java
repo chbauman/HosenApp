@@ -8,20 +8,25 @@ class IndirectSorter<T extends Comparable<T>> {
     int[] sort(T[] args) {
         Integer[] OriginalIndices = new Integer[args.length];
         int[] ReturnValue = new int[args.length];
-        for (int i=0; i<OriginalIndices.length; i++) {
+        for (int i = 0; i < OriginalIndices.length; i++) {
             OriginalIndices[i] = i;
         }
-        Arrays.sort(OriginalIndices, new IndirectCompareClass<T>(args));
-        for (int i=0; i<OriginalIndices.length; i++) ReturnValue[i] = OriginalIndices[i];
+        Arrays.sort(OriginalIndices, new IndirectCompareClass<>(args));
+        for (int i = 0; i < OriginalIndices.length; i++) ReturnValue[i] = OriginalIndices[i];
         return ReturnValue;
     }
 
-    class IndirectCompareClass<T extends Comparable<T>> implements Comparator<Integer> {
-        T[] args;
-        IndirectCompareClass(T[] args) { this.args = args; }
+    class IndirectCompareClass<T2 extends Comparable<T2>> implements Comparator<Integer> {
+        T2[] args;
+
+        IndirectCompareClass(T2[] args) {
+            this.args = args;
+        }
+
         public int compare(Integer in1, Integer in2) {
             return args[in1].compareTo(args[in2]);
         }
+
         public boolean equals(Integer in1, Integer in2) {
             return args[in1].equals(args[in2]);
         }

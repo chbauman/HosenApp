@@ -17,7 +17,7 @@ public class MyAdapter extends ArrayAdapter<String> {
     private LayoutInflater layoutInflater;
     private Bundle b;
     private Context c;
-    Cards cards;
+    private Cards cards;
 
     MyAdapter(Context c, String[] dummy, Bundle b) {
         super(c, R.layout.list_row, R.id.list_title_id, dummy);
@@ -38,7 +38,7 @@ public class MyAdapter extends ArrayAdapter<String> {
         String[] titleArr = b.getStringArray("player_names");
         int[] ids = b.getIntArray("player_ids");
         int[] cards_ids = b.getIntArray("cards");
-        int n_players = b.getInt("n_players");
+        //int n_players = b.getInt("n_players");
 
         // Find Views
         TextView title = row.findViewById(R.id.list_title_id);
@@ -50,19 +50,19 @@ public class MyAdapter extends ArrayAdapter<String> {
         cardViews[2] = row.findViewById(R.id.fc3);
 
         // Set cards
-        for(int i = 0; i < 3; ++i){
+        for (int i = 0; i < 3; ++i) {
             int card_ind = ids[position] * 3 + i;
             Bitmap card_bmp = cards.getCard(cards_ids[card_ind]);
             cardViews[i].setImageBitmap(card_bmp);
         }
 
         // Set name of player and score
-        if(titleArr != null && scores != null){
+        if (titleArr != null && scores != null) {
             title.setText(titleArr[position]);
             float curr_score = scores[position];
-            if(curr_score == 0.0f){
+            if (curr_score == 0.0f) {
                 sub_title.setText(c.getResources().getString(R.string.lost));
-            } else if(curr_score == 32.0f){
+            } else if (curr_score == 32.0f) {
                 sub_title.setText(c.getResources().getString(R.string.fire));
             } else {
                 sub_title.setText(c.getResources().getString(R.string.score_str, curr_score));

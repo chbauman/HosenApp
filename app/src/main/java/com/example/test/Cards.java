@@ -10,49 +10,46 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
 import android.widget.ImageView;
 
+
 public class Cards {
 
     // Member variables
     private Bitmap cards;
-    private Context c;
 
     // Constructor
     @TargetApi(21)
-    public Cards(Context c) {
-        this.c = c;
+    Cards(Context c) {
         Resources res = c.getResources();
         Drawable drawable = res.getDrawable(R.drawable.ic_card_deck_161536, c.getTheme());
         VectorDrawable vectorDrawable = (VectorDrawable) drawable;
         cards = getBitmap(vectorDrawable, 615, 1027);
     }
 
-
     // Public methods
-    public void setImageView(ImageView iv, int ind){
+    public void setImageView(ImageView iv, int ind) {
         Bitmap card_bmp = getCard(ind);
         iv.setImageBitmap(card_bmp);
     }
-    public Bitmap getCard(int ind) {
+
+    Bitmap getCard(int ind) {
         return getCard(ind, 4);
     }
-    public Bitmap rotateBitmap(Bitmap b){
+
+    Bitmap rotateBitmap(Bitmap b) {
         Matrix matrix = new Matrix();
-        matrix.postRotate(90);
-        Bitmap card_bmp = Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), matrix, true);
-        return card_bmp;
+        return Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), matrix, true);
     }
 
-    public Bitmap getCardBackground() {
+    Bitmap getCardBackground() {
         return getCard(54, 0);
     }
 
     // Helper functions
-    static public int card_id_to_value(int card_id){
-        if(card_id == 0){
+    static int card_id_to_value(int card_id) {
+        if (card_id == 0) {
             return 11;
-        } else if(card_id > 4){
-            return 10;
-        } else {
+        } else if (card_id > 4) return 10;
+        else {
             return card_id + 5;
         }
     }

@@ -14,13 +14,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ListView;
 
-import com.example.test.R;
-
 public class GameOverDialog extends DialogFragment {
 
     private GODialogListener listener;
 
-    public GameOverDialog(){
+    public GameOverDialog() {
         super();
     }
 
@@ -38,7 +36,7 @@ public class GameOverDialog extends DialogFragment {
         // Get Arguments
         Bundle b = getArguments();
         String[] titleArr;
-        if(b != null){
+        if (b != null) {
             titleArr = b.getStringArray("player_names");
         } else {
             throw new IllegalStateException("Where is the fucking bundle?");
@@ -48,7 +46,7 @@ public class GameOverDialog extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         Activity currentActivity = getActivity();
         LayoutInflater inflater;
-        if(currentActivity != null){
+        if (currentActivity != null) {
             inflater = currentActivity.getLayoutInflater();
         } else {
             throw new IllegalStateException("Where is the fucking activity of this dialog?");
@@ -72,7 +70,7 @@ public class GameOverDialog extends DialogFragment {
         return builder.create();
     }
 
-    public interface GODialogListener{
+    public interface GODialogListener {
         void startNew();
     }
 }

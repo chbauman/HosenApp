@@ -2,6 +2,7 @@ package com.example.test;
 
 import java.util.ArrayList;
 
+
 public class GameState {
 
     int turn_ind;
