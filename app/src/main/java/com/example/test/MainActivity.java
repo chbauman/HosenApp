@@ -39,54 +39,117 @@ import java.util.List;
  *  - Add (unit) tests
  *  - Fix the early knocking that happens occasionally and crashes the app
  *  - Make playable with drag and drop
- *  - Setup documentation (adjust comments)
+ *  - Generate javadoc documentation (add more conforming comments)
  * */
 
+/**
+ * The type Main activity.
+ */
 public class MainActivity extends AppCompatActivity implements GameOverDialog.GODialogListener {
 
 
+    /**
+     * The total number of used cards.
+     */
     int n_used_cards;
+    /**
+     * The N play cs.
+     */
     int n_play_cs;
+    /**
+     * The number of players.
+     */
     final int n_players = 4;
+    /**
+     * The total number of cards in the deck.
+     */
     final int n_cards = 36;
+    /**
+     * The base animation time.
+     */
     final int baseAnimTime = 1000;
+    /**
+     * The player names.
+     */
     final String[] ps = {"Ich", "Hansli", "Peter", "Ruedi"};
 
-    // Cards that are in the game
-    // First 3: your cards
-    // next 3 * (n_players - 1): Other players cards
-    // last 4: Three open and one hidden card (last)
+    /**
+     * Cards that are in the game.
+     * <p>
+     * First 3: your cards
+     * next 3 * (n_players - 1): Other players cards
+     * last 4: Three open and one hidden card (last)
+     */
     ArrayList<Integer> used_cards;
 
+    /**
+     * The Cards.
+     */
     Cards cards;
+    /**
+     * The Game plant.
+     */
     GamePlant game;
 
-    // State variables
+    /**
+     * The index of the selected hand card.
+     * <p>
+     * -1 means no card selected.
+     */
     int sel_hand_c = -1;
+    /**
+     * The id of the starting player.
+     */
     int starting_player = 0;
+    /**
+     * The Declared.
+     */
     boolean declared = false;
+    /**
+     * The Your turn.
+     */
     boolean your_turn = false;
 
+    /**
+     * The Chlopfed.
+     */
     int chlopfed = -100;
+    /**
+     * The Turn ind.
+     */
     int turn_ind = 0;
 
-    // End game states
+    /**
+     * The Game over.
+     */
     boolean game_over = false;
 
-    // Who's turn is it
-    // 0: You
-    // 1, 2, 3: Player 1, 2, 3
+    /**
+     * Who's turn is it.
+     * <p>
+     * 0: You
+     * 1, 2, 3: Player 1, 2, 3
+     */
     int turn = 0;
 
-    // Array containing the Views of the hand cards
+    /**
+     * The array containing the Views of the hand cards.
+     */
     ImageView[] hc_views;
 
-    // Array containing the Views of the table cards
+    /**
+     * The Array containing the Views of the table cards.
+     */
     ImageView[] tc_views;
 
-    // Array containing the Views of the other players
+    /**
+     * Array containing the Views of the other players.
+     */
     ImageView[] p_views;
 
+    /**
+     * The Added texts views.
+     */
     List<TextView> addedTextsViews = new ArrayList<>();
 
     // Same as below
@@ -94,7 +157,9 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         startNewGame();
     }
 
-    // Reset and start new game
+    /**
+     * Reset and start new game.
+     */
     public void startNewGame() {
 
         // Set state variables
@@ -177,6 +242,11 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }
     }
 
+    /**
+     * Sets cards as deck.
+     *
+     * @param open_table the open table
+     */
     public void setCardsAsDeck(boolean open_table) {
         // Sets the card images as they are in the deck.
         setHidden();
@@ -194,7 +264,9 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }
     }
 
-    // Dialog that asks if player wants to swap or keep initial cards.
+    /**
+     * Dialog that asks if player wants to swap or keep initial cards.
+     */
     public void changeCardsDialog() {
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
@@ -312,6 +384,12 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     }
 
 
+    /**
+     * Move next.
+     *
+     * @param declare_first the declare first
+     * @param player_ind    the player ind
+     */
     public void moveNext(boolean declare_first, int player_ind) {
 
         final Handler handler = new Handler();
@@ -379,7 +457,9 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }
     }
 
-    // Shows final message and then the game over dialog with the scores.
+    /**
+     * Shows final message and then the game over dialog with the scores.
+     */
     public void openGameOverDialog() {
         GameOverState gos = game.get_game_over_state();
         if (gos.id_pants >= 0) {
@@ -397,7 +477,9 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }, dec_delay);
     }
 
-    // Computes the scores and creates and opens the score dialog
+    /**
+     * Computes the scores and creates and opens the score dialog.
+     */
     public void openGameOverDialogNonDelayed() {
 
         Log.d("openGame", "called");
@@ -466,7 +548,13 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         goDialog.show(getSupportFragmentManager(), "GameOverDialog");
     }
 
-    // Animation of taking a card
+    /**
+     * Animation of taking a card.
+     *
+     * @param playerId    the player id
+     * @param table_index the table index
+     * @param hand_index  the hand index
+     */
     public void takeCardWithAnim(int playerId, int table_index, int hand_index) {
 
         Log.d(ps[playerId], "taking card " + table_index);
@@ -511,22 +599,41 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }, animTime + 100);
     }
 
-    // Player with specified player id knocks.
+    /**
+     * Player with specified player id knocks.
+     *
+     * @param playerId the player id
+     */
     public void knock(int playerId) {
         ImageView player_card_view = playerId == 0 ? hc_views[1] : p_views[playerId - 1];
         setTextViewBelowImgView(player_card_view, R.string.knocker, true);
     }
 
+    /**
+     * Pants down anim.
+     *
+     * @param playerId the player id
+     */
     public void pantsDownAnim(int playerId) {
         ImageView player_card_view = playerId == 0 ? hc_views[1] : p_views[playerId - 1];
         setTextViewBelowImgView(player_card_view, R.string.pants_down, false);
     }
 
+    /**
+     * Fire anim.
+     *
+     * @param playerId the player id
+     */
     public void fireAnim(int playerId) {
         ImageView player_card_view = playerId == 0 ? hc_views[1] : p_views[playerId - 1];
         setTextViewBelowImgView(player_card_view, R.string.fire, false);
     }
 
+    /**
+     * Take all anim.
+     *
+     * @param playerId the player id
+     */
     public void takeAllAnim(int playerId) {
         ImageView[] tempIvs = new ImageView[3];
         int hth = 0;
@@ -586,7 +693,11 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }
     }
 
-    // Knock button method
+    /**
+     * Knock button method.
+     *
+     * @param view the view
+     */
     public void knockButton(View view) {
         if (game.turn_ind > n_players) {
             your_turn = false;
@@ -596,7 +707,11 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }
     }
 
-    // Take all cards button method
+    /**
+     * Take all cards button method.
+     *
+     * @param view the view
+     */
     public void takeAllButton(View view) {
         if (your_turn) {
             your_turn = false;
@@ -613,10 +728,21 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }
     }
 
+    /**
+     * Fire button.
+     *
+     * @param view the view
+     */
     public void fireButton(View view) {
         declared = true;
     }
 
+    /**
+     * On fire boolean.
+     *
+     * @param playerID the player id
+     * @return the boolean
+     */
     public boolean onFire(int playerID) {
         for (int i = 0; i < 3; ++i) {
             final int hand_arr_ind = playerID * 3 + i;
@@ -628,7 +754,12 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         return true;
     }
 
-    // Checks if player has pants down
+    /**
+     * Checks if player has pants down.
+     *
+     * @param playerID The id of the player.
+     * @return True if player has pants down, false else.
+     */
     public boolean pantsDown(int playerID) {
         final int first_card_arr_ind = playerID * 3;
         final int first_card_id = used_cards.get(first_card_arr_ind);
@@ -651,7 +782,13 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         return has_ace;
     }
 
-    // Image view helper functions
+    /**
+     * Sets a TextView below an image view and enlarges it.
+     *
+     * @param iv          The ImageView under which to place the text.
+     * @param s           String id of the text to put.
+     * @param add_bw_anim Adds the backward animation to make it small again.
+     */
     public void setTextViewBelowImgView(ImageView iv, int s, boolean add_bw_anim) {
 
         RelativeLayout rl = findViewById(R.id.main_layout);
@@ -718,6 +855,9 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         tv.startAnimation(animSet);
     }
 
+    /**
+     * Remove first text.
+     */
     public void removeFirstText() {
         if (addedTextsViews.size() > 0) {
             TextView iv = addedTextsViews.get(0);
@@ -727,7 +867,9 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }
     }
 
-    // Sets the image of the hidden card
+    /**
+     * Sets the image of the hidden card.
+     */
     public void setHidden() {
         Bitmap card_bmp = cards.getCardBackground();
         Matrix matrix = new Matrix();
@@ -736,17 +878,30 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         tc_views[3].setImageBitmap(card_bmp);
     }
 
-    // Sets a players card
+    /**
+     * Sets a players card.
+     *
+     * @param p_ind   the p ind
+     * @param card_id the card id
+     */
     public void setPlayerCard(int p_ind, int card_id) {
         Bitmap card_bmp = cards.getCard(card_id);
         p_views[p_ind].setImageBitmap(card_bmp);
     }
 
+    /**
+     * Set player background image.
+     *
+     * @param p_ind Index of player.
+     */
     public void setPlayerBG(int p_ind) {
         Bitmap card_bmp = cards.getCardBackground();
         p_views[p_ind].setImageBitmap(card_bmp);
     }
 
+    /**
+     * Sets table cards to bg.
+     */
     public void setTableCardsToBG() {
         Bitmap card_bmp = cards.getCardBackground();
         for (int i = 0; i < 3; ++i) {
@@ -754,6 +909,9 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }
     }
 
+    /**
+     * Sets player bg images.
+     */
     public void setPlayerBGImages() {
         Bitmap card_bmp = cards.getCardBackground();
         for (int i = 0; i < 3; ++i) {
@@ -761,6 +919,13 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }
     }
 
+    /**
+     * Sets card.
+     *
+     * @param card_id       the card id
+     * @param view_array_id the view array id
+     * @param hand          the hand
+     */
     public void setCard(int card_id, int view_array_id, boolean hand) {
         Bitmap card_bmp = cards.getCard(card_id);
         if (view_array_id == 3) {
