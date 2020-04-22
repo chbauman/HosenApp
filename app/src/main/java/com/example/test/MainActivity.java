@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -25,6 +24,21 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+/*
+* TODO:
+*  - Ziehete falls unentschiede.
+*  - Better animations, esp. rotations.
+*  - Enable Hosenabe button if there is a change resulting in hose
+*  - Fix more warnings!
+*  - Horizontal view, adjust card placement.
+*  - Save statistics locally (number of wins and total games).
+*  - Better AI opponents :P
+*  - Publish on Play Store
+*  - One handler only to handle animations
+*  - Add (unit) tests
+*  - Fix the early knocking that happens occasionally and crashes the app
+* */
 
 public class MainActivity extends AppCompatActivity implements GameOverDialog.GODialogListener {
 
@@ -71,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     // Array containing the Views of the other players
     ImageView[] p_views;
 
-    List<TextView> addedTextsViews = new ArrayList<TextView>();
+    List<TextView> addedTextsViews = new ArrayList<>();
 
     public void startNew() {
         startNewGame();
@@ -258,13 +272,10 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
 
             // For hand cards
             ImageView img = hc_views[i];
-            img.setOnTouchListener(new View.OnTouchListener() {
+            img.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public boolean onTouch(final View view, final MotionEvent event) {
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        sel_hand_c = i_final;
-                    }
-                    return true;
+                public void onClick(final View view) {
+                    sel_hand_c = i_final;
                 }
             });
         }
@@ -273,11 +284,11 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
 
             // For table cards
             ImageView img = tc_views[i];
-            img.setOnTouchListener(new View.OnTouchListener() {
+            img.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public boolean onTouch(final View view, final MotionEvent event) {
+                public void onClick(final View view) {
 
-                    if (event.getAction() == MotionEvent.ACTION_DOWN && your_turn) {
+                    if (your_turn) {
 
                         if (sel_hand_c != -1 && !game_over) {
                             your_turn = false;
@@ -289,7 +300,6 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
                             moveNext(true, 0);
                         }
                     }
-                    return true;
                 }
             });
         }
