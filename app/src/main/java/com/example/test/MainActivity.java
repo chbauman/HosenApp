@@ -26,19 +26,21 @@ import java.util.Iterator;
 import java.util.List;
 
 /*
-* TODO:
-*  - Ziehete falls unentschiede.
-*  - Better animations, esp. rotations.
-*  - Enable Hosenabe button if there is a change resulting in hose
-*  - Fix more warnings!
-*  - Horizontal view, adjust card placement.
-*  - Save statistics locally (number of wins and total games).
-*  - Better AI opponents :P
-*  - Publish on Play Store
-*  - One handler only to handle animations
-*  - Add (unit) tests
-*  - Fix the early knocking that happens occasionally and crashes the app
-* */
+ * TODO:
+ *  - Ziehete falls unentschiede.
+ *  - Better animations, esp. rotations.
+ *  - Enable Hosenabe button if there is a change resulting in hose
+ *  - Fix more warnings!
+ *  - Horizontal view, adjust card placement.
+ *  - Save statistics locally (number of wins and total games).
+ *  - Better AI opponents :P
+ *  - Publish on Play Store
+ *  - One handler only to handle animations
+ *  - Add (unit) tests
+ *  - Fix the early knocking that happens occasionally and crashes the app
+ *  - Make playable with drag and drop
+ *  - Setup documentation (adjust comments)
+ * */
 
 public class MainActivity extends AppCompatActivity implements GameOverDialog.GODialogListener {
 
@@ -87,10 +89,12 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
 
     List<TextView> addedTextsViews = new ArrayList<>();
 
+    // Same as below
     public void startNew() {
         startNewGame();
     }
 
+    // Reset and start new game
     public void startNewGame() {
 
         // Set state variables
@@ -174,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     }
 
     public void setCardsAsDeck(boolean open_table) {
-        // Set Card images
+        // Sets the card images as they are in the deck.
         setHidden();
         setPlayerBGImages();
         for (int i = 0; i < 3; ++i) {
@@ -190,6 +194,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }
     }
 
+    // Dialog that asks if player wants to swap or keep initial cards.
     public void changeCardsDialog() {
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
@@ -234,6 +239,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         alertDialog.show();
     }
 
+    // Creates and finds card views and sets listeners
     @TargetApi(21)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -305,6 +311,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }
     }
 
+
     public void moveNext(boolean declare_first, int player_ind) {
 
         final Handler handler = new Handler();
@@ -372,6 +379,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }
     }
 
+    // Shows final message and then the game over dialog with the scores.
     public void openGameOverDialog() {
         GameOverState gos = game.get_game_over_state();
         if (gos.id_pants >= 0) {
@@ -389,6 +397,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }, dec_delay);
     }
 
+    // Computes the scores and creates and opens the score dialog
     public void openGameOverDialogNonDelayed() {
 
         Log.d("openGame", "called");
@@ -457,7 +466,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         goDialog.show(getSupportFragmentManager(), "GameOverDialog");
     }
 
-    // Animation
+    // Animation of taking a card
     public void takeCardWithAnim(int playerId, int table_index, int hand_index) {
 
         Log.d(ps[playerId], "taking card " + table_index);
@@ -502,6 +511,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }, animTime + 100);
     }
 
+    // Player with specified player id knocks.
     public void knock(int playerId) {
         ImageView player_card_view = playerId == 0 ? hc_views[1] : p_views[playerId - 1];
         setTextViewBelowImgView(player_card_view, R.string.knocker, true);
@@ -576,7 +586,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }
     }
 
-    // Button methods
+    // Knock button method
     public void knockButton(View view) {
         if (game.turn_ind > n_players) {
             your_turn = false;
@@ -586,6 +596,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }
     }
 
+    // Take all cards button method
     public void takeAllButton(View view) {
         if (your_turn) {
             your_turn = false;
@@ -617,6 +628,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         return true;
     }
 
+    // Checks if player has pants down
     public boolean pantsDown(int playerID) {
         final int first_card_arr_ind = playerID * 3;
         final int first_card_id = used_cards.get(first_card_arr_ind);
@@ -715,6 +727,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         }
     }
 
+    // Sets the image of the hidden card
     public void setHidden() {
         Bitmap card_bmp = cards.getCardBackground();
         Matrix matrix = new Matrix();
@@ -723,6 +736,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         tc_views[3].setImageBitmap(card_bmp);
     }
 
+    // Sets a players card
     public void setPlayerCard(int p_ind, int card_id) {
         Bitmap card_bmp = cards.getCard(card_id);
         p_views[p_ind].setImageBitmap(card_bmp);
