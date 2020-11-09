@@ -32,7 +32,7 @@ class IndirectSorter<T extends Comparable<T>> {
         return ReturnValue;
     }
 
-    static class IndirectCompareClass<T2 extends Comparable<T2>> implements Comparator<Integer> {
+    private static class IndirectCompareClass<T2 extends Comparable<T2>> implements Comparator<Integer> {
         T2[] args;
 
         IndirectCompareClass(T2[] args) {

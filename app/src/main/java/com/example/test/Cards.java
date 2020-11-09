@@ -14,12 +14,21 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 
+/**
+ * Class holding the image with all playing cards.
+ */
 public class Cards {
 
-    // Member variables
+    /**
+     * Bitmap of all cards.
+     */
     private Bitmap cards;
 
-    // Constructor
+    /**
+     * Constructor.
+     *
+     * @param c The current context.
+     */
     @TargetApi(21)
     Cards(@NotNull Context c) {
         Resources res = c.getResources();
@@ -28,12 +37,13 @@ public class Cards {
         cards = getBitmap(vectorDrawable, 615, 1027);
     }
 
-    // Public methods
-    public void setImageView(@NotNull ImageView iv, int ind) {
-        Bitmap card_bmp = getCard(ind);
-        iv.setImageBitmap(card_bmp);
-    }
-
+    /**
+     * Returns the front image of a playing card.
+     *
+     * @param ind The index of the card.
+     *
+     * @return The Bitmap of the requested card.
+     */
     Bitmap getCard(int ind) {
         return getCard(ind, 4);
     }
@@ -43,11 +53,22 @@ public class Cards {
         return Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), matrix, true);
     }
 
+    /**
+     * Returns the backside image of a card.
+     *
+     * @return The Bitmap of the backside.
+     */
     Bitmap getCardBackground() {
         return getCard(54, 0);
     }
 
-    // Helper functions
+    /**
+     * Computes the value of the card with a specific index.
+     *
+     * @param card_id The index of the card.
+     *
+     * @return Value of the card.
+     */
     @Contract(pure = true)
     static int card_id_to_value(int card_id) {
         if (card_id == 0) {

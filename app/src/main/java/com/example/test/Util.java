@@ -13,12 +13,19 @@ import android.widget.ImageView;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.stream.IntStream;
 
-// Helper class containing utility functions
+/**
+ * Helper class containing utility functions
+ */
 class Util {
 
-
-    // Returns a random permutation of length 'len'.
+    /**
+     * Generates a random permutation.
+     *
+     * @param len Length of permutation.
+     * @return The permutation.
+     */
     static ArrayList<Integer> getRandPerm(int len) {
         ArrayList<Integer> arr = new ArrayList<>(len);
         for (int i = 0; i < len; ++i) {

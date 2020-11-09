@@ -39,7 +39,6 @@ import java.util.List;
  *  - Add (unit) tests
  *  - Fix the early knocking that happens occasionally and crashes the app
  *  - Make playable with drag and drop
- *  - Generate javadoc documentation (add more conforming comments)
  * */
 
 /**
@@ -171,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         turn = 0;
 
         // Remove texts
-        Iterator itr = addedTextsViews.iterator();
+        Iterator<TextView> itr = addedTextsViews.iterator();
         while (itr.hasNext()) {
             TextView v = (TextView) itr.next();
             ViewGroup vg = (ViewGroup) (v.getParent());
