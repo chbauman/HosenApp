@@ -21,6 +21,9 @@ public class GameOverDialog extends DialogFragment {
 
     private GODialogListener listener;
 
+    /**
+     * Constructor.
+     */
     public GameOverDialog() {
         super();
     }

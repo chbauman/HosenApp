@@ -5,6 +5,11 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The game plant.
+ * <p>
+ * Holds all information about the on-going game.
+ */
 class GamePlant {
 
     // Fix constants
@@ -37,13 +42,23 @@ class GamePlant {
     private int id_wrong_declared;
     private boolean game_over;
 
-    // Cards that are in the game
-    // First 3: your cards
-    // next 3 * (n_players - 1): Other players cards
-    // last 4: Three open and one hidden card (last)
+    /**
+     * ArrayList of cards that are in the game.
+     * <p>
+     * First three: the user's cards, next three: the following player's cards
+     * and so on. Last 4: The three open and the hidden card (last).
+     */
     ArrayList<Integer> used_cards;
 
+    /**
+     * Constructor.
+     *
+     * @param n_players NUmber of players, must be 4.
+     */
     GamePlant(int n_players) {
+        if (BuildConfig.DEBUG && n_players != 4) {
+            throw new AssertionError("Assertion failed");
+        }
         this.n_players = n_players;
         n_used_cards = n_players * 3 + 4;
         t_cards_start_ind = n_players * 3;
@@ -51,7 +66,11 @@ class GamePlant {
         startGame();
     }
 
-    // (Re)set variables
+    /**
+     * Starts the game.
+     * <p>
+     * Resets all variables.
+     */
     void startGame() {
 
         // Shuffle deck
@@ -72,7 +91,13 @@ class GamePlant {
         chose_stack = false;
     }
 
-    // Choose weather to swap the cards with the table cards
+    /**
+     * Initial action.
+     * <p>
+     * Choose weather to swap the cards with the table cards or not.
+     *
+     * @param switch_cards Whether to choose the cards on the table
+     */
     void choose_stack(boolean switch_cards) {
 
         if (switch_cards) {
@@ -82,8 +107,17 @@ class GamePlant {
         chose_stack = true;
     }
 
-    // Make a move, either knock, take all or
-    // specify which card to take and give.
+    /**
+     * Make a move.
+     * <p>
+     * Either knock, take all or specify which card to take and give.
+     * The parameters `knock` and `take_all` cannot be both true!
+     *
+     * @param knock     Whether the current player knocks.
+     * @param take_all  Whether the current player takes all open cards.
+     * @param hand_ind  The index of the card in hand to swap.
+     * @param table_ind The index of the card on the table to swap.
+     */
     void make_move(boolean knock, boolean take_all, int hand_ind, int table_ind) {
         if (game_over) {
             throw new IllegalStateException("Game is fucking over!");
@@ -129,7 +163,13 @@ class GamePlant {
         declaration_pending = true;
     }
 
-    // After move declare if you are on fire or your pants are down.
+    /**
+     * Declare if you are on fire or you're pants are down.
+     * Needs to be called after `make_move`.
+     *
+     * @param pants_or_fire Whether a player declares either.
+     * @return Game state after this move.
+     */
     GameState declare(boolean pants_or_fire) {
         if (!declaration_pending) {
             throw new IllegalStateException("Need to make a move first!");
@@ -417,6 +457,11 @@ class GamePlant {
         return has_ace;
     }
 
+    /**
+     * Checks if there lies a trap on the table.
+     *
+     * @return True if there is a trap.
+     */
     private boolean trapOnTable() {
         if (check30andHalf(4)) {
             return true;
