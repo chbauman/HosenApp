@@ -8,7 +8,6 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
-import android.widget.ImageView;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -41,14 +40,19 @@ public class Cards {
      * Returns the front image of a playing card.
      *
      * @param ind The index of the card.
-     *
      * @return The Bitmap of the requested card.
      */
     Bitmap getCard(int ind) {
         return getCard(ind, 4);
     }
 
-    Bitmap rotateBitmap(Bitmap b) {
+    /**
+     * Rotates the given bitmap 90 degrees.
+     *
+     * @param b The Bitmap to rotate.
+     * @return The rotated bitmap.
+     */
+    static Bitmap rotateBitmap(Bitmap b) {
         Matrix matrix = new Matrix();
         return Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), matrix, true);
     }
@@ -66,7 +70,6 @@ public class Cards {
      * Computes the value of the card with a specific index.
      *
      * @param card_id The index of the card.
-     *
      * @return Value of the card.
      */
     @Contract(pure = true)

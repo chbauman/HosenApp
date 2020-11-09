@@ -214,7 +214,12 @@ class GamePlant {
         return new GameOverState(id_caught_in_trap, id_fired, id_wrong_declared, used_cards, scores, turn_ind, id_pants);
     }
 
-    // Automatic moving
+    /**
+     * Finds and executes a move for a player.
+     *
+     * @param playerID The ID of the player whose move needs to be found.
+     * @return GameState after executing selected move.
+     */
     GameState findMoveAdvanced(int playerID) {
 
         final int player_id = (beginner_ind + turn_ind) % n_players;
@@ -342,6 +347,11 @@ class GamePlant {
 
     }
 
+    /**
+     * Take all open card as a move.
+     *
+     * @param player_id The player that takes all cards.
+     */
     private void take_all(int player_id) {
         final int p_cards_start_ind = player_id * 3;
         int[] temp = new int[3];
@@ -355,7 +365,12 @@ class GamePlant {
         }
     }
 
-    // Analysis
+    /**
+     * Computes the score of a player.
+     *
+     * @param playerID The ID of the player.
+     * @return The score.
+     */
     private float computeScore(int playerID) {
 
         // Hose
@@ -394,6 +409,12 @@ class GamePlant {
         return (float) currMax;
     }
 
+    /**
+     * Checks if a player has three cards of one kind.
+     *
+     * @param playerID Player ID.
+     * @return Whether the player has three cards of one kind in his hands.
+     */
     private boolean check30andHalf(int playerID) {
         final int first_card_arr_ind = playerID * 3;
         final int first_card_id = used_cards.get(first_card_arr_ind);
