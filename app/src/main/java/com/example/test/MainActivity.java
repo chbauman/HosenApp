@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
         // Remove texts
         Iterator<TextView> itr = addedTextsViews.iterator();
         while (itr.hasNext()) {
-            TextView v = (TextView) itr.next();
+            TextView v = itr.next();
             ViewGroup vg = (ViewGroup) (v.getParent());
             vg.removeView(v);
             itr.remove();
@@ -928,7 +928,7 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     public void setCard(int card_id, int view_array_id, boolean hand) {
         Bitmap card_bmp = cards.getCard(card_id);
         if (view_array_id == 3) {
-            card_bmp = cards.rotateBitmap(card_bmp);
+            card_bmp = Cards.rotateBitmap(card_bmp);
         }
         ImageView[] v_arr = hand ? hc_views : tc_views;
         v_arr[view_array_id].setImageBitmap(card_bmp);
