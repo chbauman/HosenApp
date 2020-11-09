@@ -4,6 +4,9 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
+/**
+ * Holds the information about the outcome of the game.
+ */
 class GameOverState {
 
     int id_caught_in_trap;

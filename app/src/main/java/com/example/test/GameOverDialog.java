@@ -14,6 +14,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ListView;
 
+/**
+ * The dialog that pops-up when the game is over.
+ */
 public class GameOverDialog extends DialogFragment {
 
     private GODialogListener listener;
