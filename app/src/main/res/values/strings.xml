@@ -20,4 +20,7 @@
     <string name="covered_card">Covered Card</string>
     <string name="middle_card">Middle Card</string>
     <string name="middle_opponent">Middle Opponent</string>
+    <string name="hand_card">Hand Card</string>
+    <string name="opp_card">Opponent Card</string>
+    <string name="table_card">Table Card</string>
 </resources>

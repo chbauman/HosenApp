@@ -298,7 +298,20 @@ class GamePlant {
         // Take hidden card
         if (curr_max_score <= curr_score) {
             table_index = 3;
+
+            // Choose hand card with least value
             hand_index = 0;
+            int curr_min = 15;
+            for(int i = 0; i < 3; ++i){
+                final int curr_hand_card_id = hand_cards[i];
+                final int curr_number = curr_hand_card_id % 9;
+                final int curr_color = curr_hand_card_id / 9;
+                final int curr_val = Cards.card_id_to_value(curr_number);
+                if(curr_val < curr_min){
+                    curr_min = curr_val;
+                    hand_index = i;
+                }
+            }
         }
 
         // Move

@@ -18,7 +18,9 @@
         android:layout_alignEnd="@+id/cd_op2"
         android:layout_alignRight="@+id/cd_op2"
         android:layout_marginTop="0dp"
+        android:layout_marginEnd="64dp"
         android:layout_marginRight="64dp"
+        android:contentDescription="@string/table_card"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cd_verd"
         app:srcCompat="@drawable/entwurf" />
@@ -27,9 +29,10 @@
         android:id="@+id/cd_op2"
         android:layout_width="54dp"
         android:layout_height="81dp"
-        android:layout_centerHorizontal="true"
         android:layout_above="@+id/card2"
+        android:layout_centerHorizontal="true"
         android:layout_marginBottom="131dp"
+        android:contentDescription="@string/table_card"
         app:srcCompat="@drawable/entwurf" />
 
     <ImageView
@@ -40,7 +43,9 @@
         android:layout_alignEnd="@+id/cd_op2"
         android:layout_alignRight="@+id/cd_op2"
         android:layout_marginTop="0dp"
+        android:layout_marginEnd="-64dp"
         android:layout_marginRight="-64dp"
+        android:contentDescription="@string/table_card"
         app:srcCompat="@drawable/entwurf" />
 
     <ImageView
@@ -55,7 +60,8 @@
         app:layout_constraintBottom_toTopOf="@+id/card2"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/entwurf"
-        android:contentDescription="@string/covered_card" />
+        android:contentDescription="@string/covered_card"
+        android:layout_marginEnd="-13.5dp" />
 
     <ImageView
         android:id="@+id/p1"
@@ -64,8 +70,10 @@
         android:layout_alignTop="@+id/p2"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
+        android:layout_marginStart="20dp"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="0dp"
+        android:contentDescription="@string/opp_card"
         app:srcCompat="@drawable/entwurf" />
 
     <ImageView
@@ -83,12 +91,14 @@
         android:layout_height="81dp"
         android:layout_alignTop="@+id/p2"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:layout_marginTop="0dp"
+        android:layout_marginEnd="20dp"
         android:layout_marginRight="20dp"
+        android:contentDescription="@string/opp_card"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/entwurf"
-        android:layout_alignParentRight="true" />
+        app:srcCompat="@drawable/entwurf" />
 
     <ImageView
         android:id="@+id/card1"
@@ -97,8 +107,10 @@
         android:layout_alignEnd="@+id/card2"
         android:layout_alignRight="@+id/card2"
         android:layout_alignBottom="@+id/card2"
+        android:layout_marginEnd="89dp"
         android:layout_marginRight="89dp"
         android:layout_marginBottom="0dp"
+        android:contentDescription="@string/hand_card"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/entwurf" />
 
@@ -122,8 +134,10 @@
         android:layout_alignEnd="@+id/card2"
         android:layout_alignRight="@+id/card2"
         android:layout_alignBottom="@+id/card2"
+        android:layout_marginEnd="-89dp"
         android:layout_marginRight="-89dp"
         android:layout_marginBottom="0dp"
+        android:contentDescription="@string/hand_card"
         app:srcCompat="@drawable/entwurf" />
     <Button
         android:id="@+id/chlopf"
@@ -136,7 +150,9 @@
         android:onClick="knockButton"
         android:text="@string/knock"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_alignEnd="@+id/hose"
+        android:layout_marginEnd="140dp" />
 
     <Button
         android:id="@+id/tkall"
@@ -147,7 +163,9 @@
         android:layout_marginLeft="140dp"
         android:layout_marginBottom="0dp"
         android:onClick="takeAllButton"
-        android:text="@string/take_all" />
+        android:text="@string/take_all"
+        android:layout_alignStart="@+id/hose"
+        android:layout_marginStart="140dp" />
 
     <Button
         android:id="@+id/hose"

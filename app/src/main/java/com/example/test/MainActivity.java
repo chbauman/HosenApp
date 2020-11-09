@@ -30,6 +30,7 @@ import java.util.List;
  *  - Ziehete falls unentschiede.
  *  - Better animations, esp. rotations.
  *  - Enable Hosenabe button if there is a change resulting in hose
+ *  - Meh Ziit zum Hose aa säge
  *  - Fix more warnings!
  *  - Horizontal view, adjust card placement.
  *  - Save statistics locally (number of wins and total games).
