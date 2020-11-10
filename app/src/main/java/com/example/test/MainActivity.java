@@ -28,7 +28,6 @@ import java.util.List;
 /*
  * TODO:
  *  - Ziehete falls unentschiede.
- *  - Better animations, esp. rotations.
  *  - Enable Hosenabe button if there is a change resulting in hose
  *  - Meh Ziit zum Hose aa säge
  *  - Fix more warnings!
@@ -46,7 +45,6 @@ import java.util.List;
  * The type Main activity.
  */
 public class MainActivity extends AppCompatActivity implements GameOverDialog.GODialogListener {
-
 
     /**
      * The total number of used cards.
@@ -619,9 +617,9 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     }
 
     /**
-     * Fire anim.
+     * Fire animation.
      *
-     * @param playerId the player id
+     * @param playerId The ID of the player that called fire.
      */
     public void fireAnim(int playerId) {
         ImageView player_card_view = playerId == 0 ? hc_views[1] : p_views[playerId - 1];
@@ -629,31 +627,31 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
     }
 
     /**
-     * Take all anim.
+     * Animation of taking all cards.
      *
-     * @param playerId the player id
+     * @param playerId The ID of the player taking the cards.
      */
     public void takeAllAnim(int playerId) {
         ImageView[] tempIvs = new ImageView[3];
         int hth = 0;
         int wth = 0;
-        float x = 0.0f;
-        float y = 0.0f;
+        int top_dist = 0;
+        int left_dist = 0;
+
+        // Create two more image views in the case of opponents
         if (playerId != 0) {
             ImageView p_v = p_views[playerId - 1];
             tempIvs[2] = p_v;
 
             RelativeLayout rl = findViewById(R.id.main_layout);
-            int top_dist = p_v.getTop();
-            int left_dist = p_v.getLeft();
+            top_dist = p_v.getTop();
+            left_dist = p_v.getLeft();
             hth = p_v.getHeight();
             wth = p_v.getWidth();
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(wth, hth);
             params.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
             params.leftMargin = left_dist;
             params.topMargin = top_dist;
-            x = left_dist;
-            y = top_dist;
 
             Bitmap card_bmp = cards.getCardBackground();
             for (int i = 0; i < 2; ++i) {
@@ -661,10 +659,10 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
                 tempIvs[i] = new ImageView(this);
                 tempIvs[i].setImageBitmap(card_bmp);
                 rl.addView(tempIvs[i], params);
-                tempIvs[i].measure(wth, hth);
             }
         }
 
+        // Create and start the animation of all three cards
         for (int i = 0; i < 3; ++i) {
             ImageView iv1 = playerId == 0 ? hc_views[i] : tempIvs[i];
             ImageView iv2 = tc_views[i];
@@ -672,11 +670,12 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
             if (playerId == 0) {
                 anim = Util.getLinearAnim(iv1, iv2, baseAnimTime / 2, true);
             } else {
-                anim = Util.getLinearAnimFromParams(iv1, iv2, baseAnimTime / 2, true, (float) hth, (float) wth, x, y);
+                anim = Util.getLinearAnimFromParams(iv2, baseAnimTime / 2, true, (float) hth, (float) wth, (float) left_dist, (float) top_dist);
             }
             iv1.startAnimation(anim);
         }
 
+        // Remove Image views again
         if (playerId > 0) {
             final Handler handler = new Handler();
             int dec_delay = baseAnimTime + 150;

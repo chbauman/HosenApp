@@ -34,83 +34,37 @@ class Util {
         return arr;
     }
 
-    static Animation getLinearAnimFromParams(@NotNull ImageView v1, @NotNull ImageView v2, int animTime, boolean back, float vh1, float vw1, float x, float y) {
-
-        final float vh2 = v2.getMeasuredHeight();
-        final float vw2 = v2.getMeasuredWidth();
+    /**
+     * Returns an animation for a card movement.
+     *
+     * @param v2 ImageView of the card on the table.
+     * @param animTime The animation time in milli seconds.
+     * @param back Whether the animation shall be reversed after being executed.
+     * @param vh1 The height of the ImageView of the card in the hand.
+     * @param vw1 The width of the ImageView of the card in the hand.
+     * @param x The x coordinate of the position of the ImageView of the card in the hand.
+     * @param y The y coordinate of the position of the ImageView of the card in the hand.
+     * @return The requested animation.
+     */
+    static Animation getLinearAnimFromParams(@NotNull ImageView v2, int animTime, boolean back, float vh1, float vw1, float x, float y) {
+        // Read parameters
+        final float vh2 = v2.getHeight();
+        final float vw2 = v2.getWidth();
         final float centreX_player = x + vw1 / 2.0f;
         final float centreY_player = y + vh1 / 2.0f;
-        final float centreX_dest = v2.getX() + vw2 / 2.0f;
-        final float centreY_dest = v2.getY() + vh2 / 2.0f;
-        Log.d("h1", "" + vh1);
+        final float centreX_dest = v2.getLeft() + vw2 / 2.0f;
+        final float centreY_dest = v2.getTop() + vh2 / 2.0f;
 
-        final boolean rotate = vw2 > vh2;
-        final boolean scale = !rotate && (v1.getHeight() > v2.getHeight());
-
-        final float scaling_fac = ((float) vh2) / vh1;
-
-        final float dx = centreX_dest - centreX_player;
-        final float dy = centreY_dest - centreY_player;
-
-        TranslateAnimation anim = new TranslateAnimation(0.0f, dx, 0.0f, dy);
-        anim.setDuration(animTime);
-
-        // Put them together
-        Interpolator ip = new LinearInterpolator();
-        AnimationSet animSet = new AnimationSet(true);
-        animSet.setFillAfter(true);
-        animSet.setInterpolator(ip);
-
-        if (rotate) {
-            Animation rot90 = new RotateAnimation(0, 90, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-            rot90.setDuration(animTime);
-            animSet.addAnimation(rot90);
-        } else if (scale) {
-            Animation scaleAnim = new ScaleAnimation(1.0f, scaling_fac, 1.0f, scaling_fac, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-            scaleAnim.setDuration(animTime);
-            animSet.addAnimation(scaleAnim);
-        }
-        animSet.addAnimation(anim);
-        if (back) {
-            Animation anim_back = new TranslateAnimation(0.0f, -dx, 0.0f, -dy);
-            anim_back.setStartOffset(animTime + 200);
-            anim_back.setDuration(animTime);
-            animSet.addAnimation(anim_back);
-            if (rotate) {
-                Animation rot90 = new RotateAnimation(0, 90, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                rot90.setDuration(animTime);
-                rot90.setStartOffset(animTime + 200);
-                animSet.addAnimation(rot90);
-            } else if (scale) {
-                Animation scaleAnim = new ScaleAnimation(1.0f, 1.0f / scaling_fac, 1.0f, 1.0f / scaling_fac, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                scaleAnim.setDuration(animTime);
-                scaleAnim.setStartOffset(animTime + 200);
-                animSet.addAnimation(scaleAnim);
-            }
-        }
-        return animSet;
-    }
-
-    static Animation getLinearAnim(@NotNull ImageView v1, @NotNull ImageView v2, int animTime, boolean back) {
-
-        final float vh1 = v1.getMeasuredHeight();
-        final float vh2 = v2.getMeasuredHeight();
-        final float vw1 = v1.getMeasuredWidth();
-        final float vw2 = v2.getMeasuredWidth();
-        final float centreX_player = v1.getX() + vw1 / 2.0f;
-        final float centreY_player = v1.getY() + vh1 / 2.0f;
-        final float centreX_dest = v2.getX() + vw2 / 2.0f;
-        final float centreY_dest = v2.getY() + vh2 / 2.0f;
-        Log.d("h1", "" + vh1);
-
+        // Determine if a rotation and / or a scaling is needed
         final boolean rotate = vw2 > vh2;
         float scaling_fac = ((float) vh2) / vh1;
-        boolean scale = !rotate && (v1.getHeight() > v2.getHeight());
-        if(rotate && (v1.getHeight() > v2.getWidth())){
+        boolean scale = !rotate && (vh1 > vh2);
+        if(rotate && (vh1 > vw2)){
             scale = true;
             scaling_fac = ((float) vh2) / vw1;
         }
 
+        // Compute offset
         final float dx = centreX_dest - centreX_player;
         final float dy = centreY_dest - centreY_player;
 
@@ -133,6 +87,8 @@ class Util {
         TranslateAnimation anim = new TranslateAnimation(0.0f, dx, 0.0f, dy);
         anim.setDuration(animTime);
         animSet.addAnimation(anim);
+
+        // Add reversed animations
         if (back) {
             if (rotate) {
                 Animation rot90 = new RotateAnimation(0, -90, Animation.RELATIVE_TO_SELF, 0.5f + dx / vw1, Animation.RELATIVE_TO_SELF, 0.5f + dy / vh1);
@@ -154,4 +110,16 @@ class Util {
         return animSet;
     }
 
+    /**
+     * Returns an animation for a card movement.
+     *
+     * @param v1 ImageView of the player's card.
+     * @param v2 ImageView of the card on the table.
+     * @param animTime The animation time in milli seconds.
+     * @param back Whether the animation shall be reversed after being executed.
+     * @return The requested animation.
+     */
+    static Animation getLinearAnim(@NotNull ImageView v1, @NotNull ImageView v2, int animTime, boolean back) {
+        return getLinearAnimFromParams(v2, animTime, back, v1.getHeight(), v1.getWidth(), v1.getLeft(), v1.getTop());
+    }
 }
