@@ -21,7 +21,7 @@ public class Cards {
     /**
      * Bitmap of all cards.
      */
-    private Bitmap cards;
+    private final Bitmap cards;
 
     /**
      * Constructor.

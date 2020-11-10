@@ -39,6 +39,10 @@ import java.util.List;
  *  - Add (unit) tests
  *  - Fix the early knocking that happens occasionally and crashes the app
  *  - Make playable with drag and drop
+ *
+ * Done:
+ *  - Fixed Animations.
+ *  - Fix landscape mode.
  * */
 
 /**
