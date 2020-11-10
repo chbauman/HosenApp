@@ -37,7 +37,6 @@ import java.util.List;
  *  - Publish on Play Store
  *  - One handler only to handle animations
  *  - Add (unit) tests
- *  - Fix the early knocking that happens occasionally and crashes the app
  *  - Make playable with drag and drop
  *
  * Done:

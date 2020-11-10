@@ -238,7 +238,7 @@ class GamePlant {
 
         // Compute current score
         final float curr_score = computeScore(playerID);
-        if (curr_score > 26.0f && turn_ind >= n_players) {
+        if (curr_score > 26.0f && turn_ind > n_players) {
             has_knocked = true;
         }
 
