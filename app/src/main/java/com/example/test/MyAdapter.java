@@ -14,10 +14,10 @@ import android.widget.TextView;
 
 public class MyAdapter extends ArrayAdapter<String> {
 
-    private LayoutInflater layoutInflater;
-    private Bundle b;
-    private Context c;
-    private Cards cards;
+    private final LayoutInflater layoutInflater;
+    private final Bundle b;
+    private final Context c;
+    private final Cards cards;
 
     MyAdapter(Context c, String[] dummy, Bundle b) {
         super(c, R.layout.list_row, R.id.list_title_id, dummy);
