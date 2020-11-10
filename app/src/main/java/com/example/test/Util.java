@@ -13,7 +13,6 @@ import android.widget.ImageView;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.stream.IntStream;
 
 /**
  * Helper class containing utility functions
@@ -105,15 +104,15 @@ class Util {
         Log.d("h1", "" + vh1);
 
         final boolean rotate = vw2 > vh2;
-        final boolean scale = !rotate && (v1.getHeight() > v2.getHeight());
-
-        final float scaling_fac = ((float) vh2) / vh1;
+        float scaling_fac = ((float) vh2) / vh1;
+        boolean scale = !rotate && (v1.getHeight() > v2.getHeight());
+        if(rotate && (v1.getHeight() > v2.getWidth())){
+            scale = true;
+            scaling_fac = ((float) vh2) / vw1;
+        }
 
         final float dx = centreX_dest - centreX_player;
         final float dy = centreY_dest - centreY_player;
-
-        TranslateAnimation anim = new TranslateAnimation(0.0f, dx, 0.0f, dy);
-        anim.setDuration(animTime);
 
         // Put them together
         Interpolator ip = new LinearInterpolator();
@@ -125,26 +124,30 @@ class Util {
             Animation rot90 = new RotateAnimation(0, 90, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
             rot90.setDuration(animTime);
             animSet.addAnimation(rot90);
-        } else if (scale) {
+        }
+        if (scale) {
             Animation scaleAnim = new ScaleAnimation(1.0f, scaling_fac, 1.0f, scaling_fac, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
             scaleAnim.setDuration(animTime);
             animSet.addAnimation(scaleAnim);
         }
+        TranslateAnimation anim = new TranslateAnimation(0.0f, dx, 0.0f, dy);
+        anim.setDuration(animTime);
         animSet.addAnimation(anim);
         if (back) {
+            if (rotate) {
+                Animation rot90 = new RotateAnimation(0, -90, Animation.RELATIVE_TO_SELF, 0.5f + dx / vw1, Animation.RELATIVE_TO_SELF, 0.5f + dy / vh1);
+                rot90.setStartOffset(animTime + 200);
+                rot90.setDuration(animTime);
+                animSet.addAnimation(rot90);
+            }
             Animation anim_back = new TranslateAnimation(0.0f, -dx, 0.0f, -dy);
             anim_back.setStartOffset(animTime + 200);
             anim_back.setDuration(animTime);
             animSet.addAnimation(anim_back);
-            if (rotate) {
-                Animation rot90 = new RotateAnimation(0, 90, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                rot90.setDuration(animTime);
-                rot90.setStartOffset(animTime + 200);
-                animSet.addAnimation(rot90);
-            } else if (scale) {
+            if (scale) {
                 Animation scaleAnim = new ScaleAnimation(1.0f, 1.0f / scaling_fac, 1.0f, 1.0f / scaling_fac, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                scaleAnim.setDuration(animTime);
                 scaleAnim.setStartOffset(animTime + 200);
+                scaleAnim.setDuration(animTime);
                 animSet.addAnimation(scaleAnim);
             }
         }

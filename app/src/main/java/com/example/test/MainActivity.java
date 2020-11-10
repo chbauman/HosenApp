@@ -185,7 +185,6 @@ public class MainActivity extends AppCompatActivity implements GameOverDialog.GO
 
         // Start new game
         game.startGame();
-        //game.beginner_ind = 0;
         used_cards = game.used_cards;
         starting_player = game.beginner_ind;
         Log.d("beginning player: ", "" + starting_player);
